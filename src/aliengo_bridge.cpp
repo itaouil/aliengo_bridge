@@ -139,7 +139,7 @@ void AlienGoBridge::publishState()
     msg.mode = m_state.mode;
 
     imu_msg.header.stamp = ros::Time::now();
-    imu_msg.header.frame_id = "imu_link"
+    imu_msg.header.frame_id = "imu_link";
 
     imu_msg.orientation.x = m_state.imu.quaternion[0];
     imu_msg.orientation.y = m_state.imu.quaternion[1];
