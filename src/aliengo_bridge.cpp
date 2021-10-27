@@ -23,7 +23,7 @@ AlienGoBridge::AlienGoBridge(ros::NodeHandle ph)
     m_motion_timestep = static_cast<int>( 1000 * m_dt );
     m_udp.InitCmdData(m_cmd);
     
-    InitEnvironment();
+    //InitEnvironment();
     
     m_loop_udpSend.start();
     m_loop_udpRecv.start();
