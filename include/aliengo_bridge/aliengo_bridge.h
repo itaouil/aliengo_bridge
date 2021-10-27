@@ -74,7 +74,6 @@ private:
     void UDPSend();
     void RobotControl();
     
-//     void cmdCallback( unitree_legged_msgs::HighCmdConstPtr& cmd );
     void cmdCallback( const unitree_legged_msgs::HighCmd& cmd );
     void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void publishState();

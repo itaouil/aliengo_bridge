@@ -23,6 +23,7 @@ AlienGoBridge::AlienGoBridge(ros::NodeHandle ph)
     m_motion_timestep = static_cast<int>( 1000 * m_dt );
     m_udp.InitCmdData(m_cmd);
     
+    // Leave it commented
     //InitEnvironment();
     
     m_loop_udpSend.start();
@@ -39,8 +40,6 @@ void AlienGoBridge::cmdCallback( const unitree_legged_msgs::HighCmd& cmd )
     m_cmd.sideSpeed = cmd.sideSpeed;
     m_cmd.rotateSpeed = cmd.rotateSpeed;
     m_cmd.bodyHeight = cmd.bodyHeight;
-    
-//     m_cmd.footRaiseHeight = cmd.footRaiseHeight;
     
     m_cmd.yaw = cmd.yaw;
     m_cmd.roll  = cmd.roll;
@@ -81,8 +80,6 @@ void AlienGoBridge::UDPSend()
 
 void AlienGoBridge::RobotControl() 
 {
-//     m_motiontime += m_motion_timestep;
-    
     m_state_mutex.lock();
     m_udp.GetRecv( m_state );
     m_state_mutex.unlock();
