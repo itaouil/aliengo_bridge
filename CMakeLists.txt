@@ -36,9 +36,12 @@ include_directories(
 
 link_directories(lib)
 
-# add_compile_options(-std=c++11)
-
-set(EXTRA_LIBS -pthread libunitree_legged_sdk_amd64.so lcm)
+# On-board PC (AMD64)
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(amd64)|(AMD64)")
+  set(EXTRA_LIBS -pthread libunitree_legged_sdk_amd64.so lcm)
+# Nvidia TX2 (ARM64)
+else ()
+  set(EXTRA_LIBS -pthread libunitree_legged_sdk_arm64.so lcm)
 
 # set(CMAKE_CXX_FLAGS "-O3")
 
