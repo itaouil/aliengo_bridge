@@ -42,6 +42,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "(amd64)|(AMD64)")
 # Nvidia TX2 (ARM64)
 else ()
   set(EXTRA_LIBS -pthread libunitree_legged_sdk_arm64.so lcm)
+endif ()
 
 # set(CMAKE_CXX_FLAGS "-O3")
 
