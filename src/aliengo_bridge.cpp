@@ -15,9 +15,9 @@ AlienGoBridge::AlienGoBridge(ros::NodeHandle ph)
 {
     // ROS
     m_imu_pub = ph.advertise< sensor_msgs::Imu >( "imu", 1 );
-    m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "robot_state", 1 );
     m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
     m_joy_sub = ph.subscribe( "joy", 1, &AlienGoBridge::joyCallback, this );
+    m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "robot_state", 1 );
     
     // SDK
     m_motion_timestep = static_cast<int>( 1000 * m_dt );
@@ -53,8 +53,8 @@ void AlienGoBridge::joyCallback(const sensor_msgs::Joy::ConstPtr& msg) {
     boost::mutex::scoped_lock lock(m_cmd_mutex);
     m_last_cmd_time = msg->header.stamp;
     
-    m_cmd.forwardSpeed = m_config.velLimitForward() * msg->axes[ m_config.gamepadRightVerticalAxis() ];
     m_cmd.sideSpeed = m_config.velLimitSide() * msg->axes[ m_config.gamepadRightHorizontalAxis() ];
+    m_cmd.forwardSpeed = m_config.velLimitForward() * msg->axes[ m_config.gamepadRightVerticalAxis() ];
     m_cmd.rotateSpeed = m_config.velLimitRotation() * msg->axes[ m_config.gamepadLeftHorizontalAxis() ];
     
     if ( m_config.gamepadButtonStart() )
@@ -121,12 +121,42 @@ void AlienGoBridge::RobotControl()
     publishState();
 }
 
+void AliengoBridge::populateIMUMsg(sensor_msgs::Imu& p_imuMsg,
+                                   const unitree_legged_msgs::IMU& p_highStateIMU)
+{
+    p_imuMsg.header.stamp = ros::Time::now();
+    p_imuMsg.header.frame_id = "imu_link";
+
+    p_imuMsg.orientation.x = p_highStateIMU.imu.quaternion[0];
+    p_imuMsg.orientation.y = p_highStateIMU.imu.quaternion[1];
+    p_imuMsg.orientation.z = p_highStateIMU.imu.quaternion[2];
+    p_imuMsg.orientation.w = p_highStateIMU.imu.quaternion[3];
+
+    p_imuMsg.angular_velocity.x = p_highStateIMU.imu.gyroscope[0];
+    p_imuMsg.angular_velocity.y = p_highStateIMU.imu.gyroscope[1];
+    p_imuMsg.angular_velocity.z = p_highStateIMU.imu.gyroscope[2];
+
+    p_imuMsg.linear_acceleration.x = p_highStateIMU.imu.accelerometer[0];
+    p_imuMsg.linear_acceleration.y = p_highStateIMU.imu.accelerometer[1];
+    p_imuMsg.linear_acceleration.z = p_highStateIMU.imu.accelerometer[2];
+}
+
+void AliengoBridge::populateJointStateMsg(sensor_msgs::JointState& p_jointStateMsg,
+                                          const unitree_legged_msgs::HighCmd& cmd)
+{
+    p_jointStateMsg.header.stamp = ros::Time::now();
+    p_jointStateMsg.header.frame_id = "tbf";
+}
+
+
 void AlienGoBridge::publishState()
 {
     boost::mutex::scoped_lock lock(m_state_mutex);
     
-    sensor_msgs::Imu imu_msg;
+    // Messages to be published
+    sensor_msgs::Imu l_imuMsg;
     unitree_legged_msgs::HighState msg;
+    sensor_msgs::JointState l_jointStateMsg;
     
     msg.levelFlag = m_state.levelFlag;
     msg.commVersion = m_state.commVersion;
@@ -134,22 +164,6 @@ void AlienGoBridge::publishState()
     msg.SN = m_state.SN;
     msg.bandWidth = m_state.bandWidth;
     msg.mode = m_state.mode;
-
-    imu_msg.header.stamp = ros::Time::now();
-    imu_msg.header.frame_id = "imu_link";
-
-    imu_msg.orientation.x = m_state.imu.quaternion[0];
-    imu_msg.orientation.y = m_state.imu.quaternion[1];
-    imu_msg.orientation.z = m_state.imu.quaternion[2];
-    imu_msg.orientation.w = m_state.imu.quaternion[3];
-
-    imu_msg.angular_velocity.x = m_state.imu.gyroscope[0];
-    imu_msg.angular_velocity.y = m_state.imu.gyroscope[1];
-    imu_msg.angular_velocity.z = m_state.imu.gyroscope[2];
-
-    imu_msg.linear_acceleration.x = m_state.imu.accelerometer[0];
-    imu_msg.linear_acceleration.y = m_state.imu.accelerometer[1];
-    imu_msg.linear_acceleration.z = m_state.imu.accelerometer[2];
     
     msg.imu.quaternion[0] = m_state.imu.quaternion[0];
     msg.imu.quaternion[1] = m_state.imu.quaternion[1];

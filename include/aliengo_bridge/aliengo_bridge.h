@@ -12,6 +12,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/Imu.h>
+#include <sensor_msgs/JointState.h>
 #include <config_server/parameter.h>
 
 // Unitree
@@ -25,14 +26,15 @@ namespace aliengo_bridge
 {
 struct GamepadConfig {
     // Axis
-    config_server::Parameter<int> gamepadLeftHorizontalAxis{"/gamepad/left_horizontal", 0, 1, 7, 0};
-    config_server::Parameter<int> gamepadLeftVerticalAxis{"/gamepad/left_vertical", 0, 1, 7, 1};
-    config_server::Parameter<int> gamepadRightHorizontalAxis{"/gamepad/right_horizontal", 0, 1, 7, 3};
-    config_server::Parameter<int> gamepadRightVerticalAxis{"/gamepad/to_odom", 0, 1, 7, 4};
     config_server::Parameter<int> gamepadButtonStart{"/gamepad/start", 0, 1, 7, 7};
+    config_server::Parameter<int> gamepadRightVerticalAxis{"/gamepad/to_odom", 0, 1, 7, 4};
+    config_server::Parameter<int> gamepadLeftVerticalAxis{"/gamepad/left_vertical", 0, 1, 7, 1};
+    config_server::Parameter<int> gamepadLeftHorizontalAxis{"/gamepad/left_horizontal", 0, 1, 7, 0};
+    config_server::Parameter<int> gamepadRightHorizontalAxis{"/gamepad/right_horizontal", 0, 1, 7, 3};
     
-    config_server::Parameter<float> velLimitForward{"/vel_limits/forward", 0, 0.1, 1, 0.5};
+    // Velocity limits
     config_server::Parameter<float> velLimitSide{"/vel_limits/side", 0, 0.1, 1, 0.5};
+    config_server::Parameter<float> velLimitForward{"/vel_limits/forward", 0, 0.1, 1, 0.5};
     config_server::Parameter<float> velLimitRotation{"/vel_limits/rotation", 0, 0.1, 1, 0.5};
 };
 
@@ -42,6 +44,17 @@ public:
     AlienGoBridge(ros::NodeHandle ph);
     
 private:
+    void UDPRecv();
+    void UDPSend();
+    void RobotControl();
+    void publishState();
+    void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
+    void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
+    void populateIMUMsg(sensor_msgs::Imu& p_imuMsg,
+                        const unitree_legged_msgs::IMU& p_highStateIMU);
+    void populateJointStateMsg(sensor_msgs::JointState& p_jointStateMsg,
+                               const unitree_legged_msgs::HighCmd& cmd);
+
     ros::NodeHandle m_ph;
     
     GamepadConfig m_config;
@@ -70,13 +83,6 @@ private:
     boost::mutex m_cmd_mutex;
     boost::mutex m_state_mutex;
     
-    void UDPRecv();
-    void UDPSend();
-    void RobotControl();
-    
-    void cmdCallback( const unitree_legged_msgs::HighCmd& cmd );
-    void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
-    void publishState();
 };
 
 }
