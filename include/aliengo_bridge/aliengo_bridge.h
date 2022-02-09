@@ -24,20 +24,6 @@ using namespace UNITREE_LEGGED_SDK;
 
 namespace aliengo_bridge
 {
-struct GamepadConfig {
-    // Axis
-    config_server::Parameter<int> gamepadButtonStart{"/gamepad/start", 0, 1, 7, 7};
-    config_server::Parameter<int> gamepadRightVerticalAxis{"/gamepad/to_odom", 0, 1, 7, 4};
-    config_server::Parameter<int> gamepadLeftVerticalAxis{"/gamepad/left_vertical", 0, 1, 7, 1};
-    config_server::Parameter<int> gamepadLeftHorizontalAxis{"/gamepad/left_horizontal", 0, 1, 7, 0};
-    config_server::Parameter<int> gamepadRightHorizontalAxis{"/gamepad/right_horizontal", 0, 1, 7, 3};
-    
-    // Velocity limits
-    config_server::Parameter<float> velLimitSide{"/vel_limits/side", 0, 0.1, 1, 0.5};
-    config_server::Parameter<float> velLimitForward{"/vel_limits/forward", 0, 0.1, 1, 0.5};
-    config_server::Parameter<float> velLimitRotation{"/vel_limits/rotation", 0, 0.1, 1, 0.5};
-};
-
 class AlienGoBridge
 {
 public:
@@ -48,24 +34,23 @@ private:
     void UDPSend();
     void RobotControl();
     void publishState();
-    void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
     void populateIMUMsg(sensor_msgs::Imu& p_imuMsg,
                         const unitree_legged_msgs::IMU& p_highStateIMU);
-    void populateJointStateMsg(sensor_msgs::JointState& p_jointStateMsg,
-                               const unitree_legged_msgs::HighCmd& cmd);
 
     ros::NodeHandle m_ph;
+
     
-    GamepadConfig m_config;
-    
-    Safety m_safe;
     UDP m_udp;
-    HighCmd m_cmd = {0};
-    HighState m_state = {0};
-    int m_motiontime = 0;
+    Safety m_safe;
     float m_dt = 0.002;     // 0.001~0.01
+    HighCmd m_cmd = {0};
+    int m_motiontime = 0;
     int m_motion_timestep;
+    HighState m_state = {0};
+    float m_lower_velocity = 0.0;
+    float m_higher_velocity = 0.1;
+    xRockerBtnDataStruct _keyData;
     
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;
@@ -73,7 +58,6 @@ private:
     
     ros::Publisher m_imu_pub;
     ros::Subscriber m_cmd_sub;
-    ros::Subscriber m_joy_sub;
     ros::Publisher m_state_pub;
     
     ros::Time m_last_cmd_time;

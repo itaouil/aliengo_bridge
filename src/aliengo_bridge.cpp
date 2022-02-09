@@ -14,14 +14,13 @@ AlienGoBridge::AlienGoBridge(ros::NodeHandle ph)
 , m_loop_udpRecv("udp_recv", m_dt, 3, boost::bind(&AlienGoBridge::UDPRecv, this))
 {
     // ROS
-    m_imu_pub = ph.advertise< sensor_msgs::Imu >( "imu", 1 );
-    m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
-    m_joy_sub = ph.subscribe( "joy", 1, &AlienGoBridge::joyCallback, this );
-    m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "robot_state", 1 );
+    m_imu_pub = ph.advertise< sensor_msgs::Imu >( "aliengo/imu", 1 );
+    m_cmd_sub = ph.subscribe( "aliengo/command", 1, &AlienGoBridge::cmdCallback, this );
+    m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "aliengo/high_state", 1 );
     
     // SDK
-    m_motion_timestep = static_cast<int>( 1000 * m_dt );
     m_udp.InitCmdData(m_cmd);
+    m_motion_timestep = static_cast<int>( 1000 * m_dt );
     
     // Leave it commented
     //InitEnvironment();
@@ -45,27 +44,8 @@ void AlienGoBridge::cmdCallback( const unitree_legged_msgs::HighCmd& cmd )
     m_cmd.roll  = cmd.roll;
     m_cmd.pitch = cmd.pitch;
     
+    m_received_cmd = true;
     m_last_cmd_time = ros::Time::now();
-    m_received_cmd = true;
-}
-
-void AlienGoBridge::joyCallback(const sensor_msgs::Joy::ConstPtr& msg) {
-    boost::mutex::scoped_lock lock(m_cmd_mutex);
-    m_last_cmd_time = msg->header.stamp;
-    
-    m_cmd.sideSpeed = m_config.velLimitSide() * msg->axes[ m_config.gamepadRightHorizontalAxis() ];
-    m_cmd.forwardSpeed = m_config.velLimitForward() * msg->axes[ m_config.gamepadRightVerticalAxis() ];
-    m_cmd.rotateSpeed = m_config.velLimitRotation() * msg->axes[ m_config.gamepadLeftHorizontalAxis() ];
-    
-    if ( m_config.gamepadButtonStart() )
-    {
-        if ( m_cmd.mode == 2 )
-            m_cmd.mode = 1;
-        else
-            m_cmd.mode = 2;
-    }
-    
-    m_received_cmd = true;
 }
 
 void AlienGoBridge::UDPRecv()
@@ -83,6 +63,11 @@ void AlienGoBridge::RobotControl()
     m_state_mutex.lock();
     m_udp.GetRecv( m_state );
     m_state_mutex.unlock();
+
+    memcpy(&_keyData, m_state.wirelessRemote, 40);
+    if((int)_keyData.btn.components.A == 1){
+        std::cout << "The key A is pressed, and the value of lx is " << _keyData.lx << std::endl;
+    }
     
     m_cmd_mutex.lock();
     if ( !m_received_cmd )
@@ -140,14 +125,6 @@ void AliengoBridge::populateIMUMsg(sensor_msgs::Imu& p_imuMsg,
     p_imuMsg.linear_acceleration.y = p_highStateIMU.imu.accelerometer[1];
     p_imuMsg.linear_acceleration.z = p_highStateIMU.imu.accelerometer[2];
 }
-
-void AliengoBridge::populateJointStateMsg(sensor_msgs::JointState& p_jointStateMsg,
-                                          const unitree_legged_msgs::HighCmd& cmd)
-{
-    p_jointStateMsg.header.stamp = ros::Time::now();
-    p_jointStateMsg.header.frame_id = "tbf";
-}
-
 
 void AlienGoBridge::publishState()
 {
