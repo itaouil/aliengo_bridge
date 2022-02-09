@@ -14,7 +14,6 @@ AlienGoBridge::AlienGoBridge(ros::NodeHandle ph)
 , m_loop_udpRecv("udp_recv", m_dt, 3, boost::bind(&AlienGoBridge::UDPRecv, this))
 {
     // ROS
-    m_imu_pub = ph.advertise< sensor_msgs::Imu >( "aliengo/imu", 1 );
     m_cmd_sub = ph.subscribe( "aliengo/command", 1, &AlienGoBridge::cmdCallback, this );
     m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "aliengo/high_state", 1 );
     
@@ -106,26 +105,6 @@ void AlienGoBridge::RobotControl()
     publishState();
 }
 
-void AliengoBridge::populateIMUMsg(sensor_msgs::Imu& p_imuMsg,
-                                   const unitree_legged_msgs::IMU& p_highStateIMU)
-{
-    p_imuMsg.header.stamp = ros::Time::now();
-    p_imuMsg.header.frame_id = "imu_link";
-
-    p_imuMsg.orientation.x = p_highStateIMU.imu.quaternion[0];
-    p_imuMsg.orientation.y = p_highStateIMU.imu.quaternion[1];
-    p_imuMsg.orientation.z = p_highStateIMU.imu.quaternion[2];
-    p_imuMsg.orientation.w = p_highStateIMU.imu.quaternion[3];
-
-    p_imuMsg.angular_velocity.x = p_highStateIMU.imu.gyroscope[0];
-    p_imuMsg.angular_velocity.y = p_highStateIMU.imu.gyroscope[1];
-    p_imuMsg.angular_velocity.z = p_highStateIMU.imu.gyroscope[2];
-
-    p_imuMsg.linear_acceleration.x = p_highStateIMU.imu.accelerometer[0];
-    p_imuMsg.linear_acceleration.y = p_highStateIMU.imu.accelerometer[1];
-    p_imuMsg.linear_acceleration.z = p_highStateIMU.imu.accelerometer[2];
-}
-
 void AlienGoBridge::publishState()
 {
     boost::mutex::scoped_lock lock(m_state_mutex);
@@ -185,7 +164,6 @@ void AlienGoBridge::publishState()
     msg.reserve = m_state.reserve;
     msg.crc = m_state.crc;
     
-    m_imu_pub.publish( imu_msg );
     m_state_pub.publish( msg );
 }
 

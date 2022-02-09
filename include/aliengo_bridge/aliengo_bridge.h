@@ -18,6 +18,7 @@
 // Unitree
 #include <unitree_legged_msgs/HighCmd.h>
 #include <unitree_legged_msgs/HighState.h>
+#include "unitree_legged_sdk/unitree_joystick.h"
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 
 using namespace UNITREE_LEGGED_SDK;
@@ -35,28 +36,25 @@ private:
     void RobotControl();
     void publishState();
     void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
-    void populateIMUMsg(sensor_msgs::Imu& p_imuMsg,
-                        const unitree_legged_msgs::IMU& p_highStateIMU);
 
     ros::NodeHandle m_ph;
-
     
     UDP m_udp;
     Safety m_safe;
-    float m_dt = 0.002;     // 0.001~0.01
     HighCmd m_cmd = {0};
+    HighState m_state = {0};
+    xRockerBtnDataStruct _keyData;
+
+    float m_dt = 0.002;     // 0.001~0.01
     int m_motiontime = 0;
     int m_motion_timestep;
-    HighState m_state = {0};
     float m_lower_velocity = 0.0;
     float m_higher_velocity = 0.1;
-    xRockerBtnDataStruct _keyData;
     
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;
     LoopFunc m_loop_udpRecv;
     
-    ros::Publisher m_imu_pub;
     ros::Subscriber m_cmd_sub;
     ros::Publisher m_state_pub;
     
