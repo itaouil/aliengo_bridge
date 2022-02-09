@@ -13,7 +13,6 @@
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/JointState.h>
-#include <config_server/parameter.h>
 
 // Unitree
 #include <unitree_legged_msgs/HighCmd.h>

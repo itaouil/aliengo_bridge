@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   sensor_msgs
   geometry_msgs
-  config_server
   unitree_legged_msgs
 )
 
@@ -20,9 +19,6 @@ set(CMAKE_CXX_STANDARD 11)
 ###################################
 catkin_package(
  INCLUDE_DIRS include
- #LIBRARIES conversion 
-#  CATKIN_DEPENDS geometry_msgs mod_planning nav_msgs
-#  DEPENDS system_lib
 )
 
 ###########

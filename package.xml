@@ -12,7 +12,6 @@
   <depend>nav_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>config_server</depend>
   <depend>unitree_legged_msgs</depend>
   
   <exec_depend>joy</exec_depend>
