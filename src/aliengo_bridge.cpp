@@ -141,22 +141,22 @@ void AlienGoBridge::control()
     {
         std::cout << "Sending fwd max velocity command: " << m_cmd_max_velocity << std::endl;
     }
-    else if (_keyData.ly < -0.95)
-    {
-        std::cout << "Sending bwd max velocity command: " << -m_cmd_min_velocity << std::endl;
-    }
-    else if (_keyData.lx > 0.95)
-    {
-        std::cout << "Sending clockwise velocity command: " << m_cmd_max_velocity << std::endl;
-    }
-    else if (_keyData.lx < -0.95)
-    {
-        std::cout << "Sending counter clockwise velocity command: " << -m_cmd_max_velocity << std::endl;
-    }
-    else
-    {
-        std::cout << "Sending fwd min velocity command: " << m_cmd_min_velocity << std::endl;
-    }
+    // else if (_keyData.ly < -0.95)
+    // {
+    //     std::cout << "Sending bwd max velocity command: " << -m_cmd_min_velocity << std::endl;
+    // }
+    // else if (_keyData.lx > 0.95)
+    // {
+    //     std::cout << "Sending clockwise velocity command: " << m_cmd_max_velocity << std::endl;
+    // }
+    // else if (_keyData.lx < -0.95)
+    // {
+    //     std::cout << "Sending counter clockwise velocity command: " << -m_cmd_max_velocity << std::endl;
+    // }
+    // else
+    // {
+    //     std::cout << "Sending fwd min velocity command: " << m_cmd_min_velocity << std::endl;
+    // }
     
     m_cmd_mutex.lock();
     if (!m_received_cmd)
