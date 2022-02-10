@@ -8,7 +8,7 @@ namespace aliengo_bridge
 AlienGoBridge::AlienGoBridge(ros::NodeHandle ph)
 : m_ph( ph )
 , m_safe(LeggedType::Aliengo)
-, m_udp(8090, "192.168.123.220", 8082, sizeof(HighCmd), sizeof(HighState))^
+, m_udp(8090, "192.168.123.220", 8082, sizeof(HighCmd), sizeof(HighState))
 , m_loop_control("control_loop", m_dt, boost::bind(&AlienGoBridge::control, this))
 , m_loop_udpSend("udp_send", m_dt, 3, boost::bind(&AlienGoBridge::UDPSend, this))
 , m_loop_udpRecv("udp_recv", m_dt, 3, boost::bind(&AlienGoBridge::UDPRecv, this))
