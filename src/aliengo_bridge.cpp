@@ -204,9 +204,6 @@ void AlienGoBridge::publishState()
     msg.imu.accelerometer[0] = m_state.imu.accelerometer[0];
     msg.imu.accelerometer[1] = m_state.imu.accelerometer[1];
     msg.imu.accelerometer[2] = m_state.imu.accelerometer[2];
-    msg.imu.rpy[0] = m_state.imu.rpy[0];
-    msg.imu.rpy[1] = m_state.imu.rpy[1];
-    msg.imu.rpy[2] = m_state.imu.rpy[2];
     msg.imu.temperature = m_state.imu.temperature;
     
     msg.gaitType = m_state.gaitType;
