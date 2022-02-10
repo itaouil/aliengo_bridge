@@ -59,7 +59,7 @@ void AlienGoBridge::UDPSend()
 
 void AlienGoBridge::resetCmd()
 {
-    m_cmd.mode = 1;               // 0. idle, default stand
+    m_cmd.mode = 0;               // 0. idle, default stand
                                 // 1. force stand (controlled by dBodyHeight + ypr)
                                 // 2. target velocity walking (controlled by velocity + yawSpeed)
                                 // 3. target position walking (controlled by position + ypr[0])
@@ -91,51 +91,51 @@ void AlienGoBridge::control()
     m_udp.GetRecv( m_state );
     m_state_mutex.unlock();
 
-    memcpy(&_keyData, m_state.wirelessRemote, 40);
+    // memcpy(&_keyData, m_state.wirelessRemote, 40);
 
-    if ((ros::Time::now() - m_last_joy_time).toSec() > 1) 
-    {
-        // if((int)_keyData.btn.components.select == 1)
-        // {
-        //     m_cmd_max_velocity = 0.1;
-        //     m_cmd_min_velocity = 0.0; 
+    // if ((ros::Time::now() - m_last_joy_time).toSec() > 1) 
+    // {
+    //     // if((int)_keyData.btn.components.select == 1)
+    //     // {
+    //     //     m_cmd_max_velocity = 0.1;
+    //     //     m_cmd_min_velocity = 0.0; 
 
-        //     m_last_joy_time = ros::Time::now();
-        //     std::cout << "Reset max and min velocities to: " << 0.1 << " and " << 0.0 << std::endl;
-        // }
-        if((int)_keyData.btn.components.Y == 1)
-        {
-            if (m_cmd_max_velocity < 0.9)
-                m_cmd_max_velocity += 0.1;
+    //     //     m_last_joy_time = ros::Time::now();
+    //     //     std::cout << "Reset max and min velocities to: " << 0.1 << " and " << 0.0 << std::endl;
+    //     // }
+    //     if((int)_keyData.btn.components.Y == 1)
+    //     {
+    //         if (m_cmd_max_velocity < 0.9)
+    //             m_cmd_max_velocity += 0.1;
             
-            m_last_joy_time = ros::Time::now();
-            std::cout << "Current max velocity is: " << m_cmd_max_velocity << std::endl;
-        }
-        else if((int)_keyData.btn.components.A == 1)
-        {
-            if (m_cmd_max_velocity > 0.0)
-                m_cmd_max_velocity -= 0.1;
+    //         m_last_joy_time = ros::Time::now();
+    //         std::cout << "Current max velocity is: " << m_cmd_max_velocity << std::endl;
+    //     }
+    //     else if((int)_keyData.btn.components.A == 1)
+    //     {
+    //         if (m_cmd_max_velocity > 0.0)
+    //             m_cmd_max_velocity -= 0.1;
 
-            m_last_joy_time = ros::Time::now();
-            std::cout << "Current max velocity is: " << m_cmd_max_velocity << std::endl;
-        }
-        else if((int)_keyData.btn.components.B == 1)
-        {
-            if (m_cmd_min_velocity < 0.8)
-                m_cmd_min_velocity += 0.1;
+    //         m_last_joy_time = ros::Time::now();
+    //         std::cout << "Current max velocity is: " << m_cmd_max_velocity << std::endl;
+    //     }
+    //     else if((int)_keyData.btn.components.B == 1)
+    //     {
+    //         if (m_cmd_min_velocity < 0.8)
+    //             m_cmd_min_velocity += 0.1;
             
-            m_last_joy_time = ros::Time::now();
-            std::cout << "Current min velocity is: " << m_cmd_min_velocity << std::endl;
-        }
-        else if((int)_keyData.btn.components.X == 1)
-        {
-            if (m_cmd_min_velocity > 0.0)
-                m_cmd_min_velocity -= 0.1;
+    //         m_last_joy_time = ros::Time::now();
+    //         std::cout << "Current min velocity is: " << m_cmd_min_velocity << std::endl;
+    //     }
+    //     else if((int)_keyData.btn.components.X == 1)
+    //     {
+    //         if (m_cmd_min_velocity > 0.0)
+    //             m_cmd_min_velocity -= 0.1;
             
-            m_last_joy_time = ros::Time::now();
-            std::cout << "Current min velocity is: " << m_cmd_min_velocity << std::endl;
-        }
-    }
+    //         m_last_joy_time = ros::Time::now();
+    //         std::cout << "Current min velocity is: " << m_cmd_min_velocity << std::endl;
+    //     }
+    // }
 
     // if (_keyData.ly > 0.95)
     // {
