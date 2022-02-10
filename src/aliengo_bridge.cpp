@@ -8,8 +8,8 @@ namespace aliengo_bridge
 AlienGoBridge::AlienGoBridge(ros::NodeHandle ph)
 : m_ph( ph )
 , m_safe(LeggedType::Aliengo)
-, m_udp(8090, "192.168.123.220", 8082, sizeof(HighCmd), sizeof(HighState))
-, m_loop_control("control_loop", m_dt, boost::bind(&AlienGoBridge::RobotControl, this))
+, m_udp(8090, "192.168.123.220", 8082, sizeof(HighCmd), sizeof(HighState))^
+, m_loop_control("control_loop", m_dt, boost::bind(&AlienGoBridge::control, this))
 , m_loop_udpSend("udp_send", m_dt, 3, boost::bind(&AlienGoBridge::UDPSend, this))
 , m_loop_udpRecv("udp_recv", m_dt, 3, boost::bind(&AlienGoBridge::UDPRecv, this))
 {
@@ -31,20 +31,20 @@ AlienGoBridge::AlienGoBridge(ros::NodeHandle ph)
 
 void AlienGoBridge::cmdCallback( const unitree_legged_msgs::HighCmd& cmd )
 {
-    boost::mutex::scoped_lock lock(m_cmd_mutex);
-    m_cmd.mode = cmd.mode;      // 0:idle, default stand      1:forced stand     2:walk continuously
+    // boost::mutex::scoped_lock lock(m_cmd_mutex);
+    // m_cmd.mode = cmd.mode;      // 0:idle, default stand      1:forced stand     2:walk continuously
     
-    m_cmd.forwardSpeed = cmd.forwardSpeed;
-    m_cmd.sideSpeed = cmd.sideSpeed;
-    m_cmd.rotateSpeed = cmd.rotateSpeed;
-    m_cmd.bodyHeight = cmd.bodyHeight;
+    // m_cmd.forwardSpeed = cmd.forwardSpeed;
+    // m_cmd.sideSpeed = cmd.sideSpeed;
+    // m_cmd.rotateSpeed = cmd.rotateSpeed;
+    // m_cmd.bodyHeight = cmd.bodyHeight;
     
-    m_cmd.yaw = cmd.yaw;
-    m_cmd.roll  = cmd.roll;
-    m_cmd.pitch = cmd.pitch;
+    // m_cmd.yaw = cmd.yaw;
+    // m_cmd.roll  = cmd.roll;
+    // m_cmd.pitch = cmd.pitch;
     
-    m_received_cmd = true;
-    m_last_cmd_time = ros::Time::now();
+    // m_received_cmd = true;
+    // m_last_cmd_time = ros::Time::now();
 }
 
 void AlienGoBridge::UDPRecv()
@@ -192,29 +192,29 @@ void AlienGoBridge::publishState()
     msg.SN = m_state.SN;
     msg.bandWidth = m_state.bandWidth;
     msg.mode = m_state.mode;
+    msg.progress = m_state.progress;
     
     msg.imu.quaternion[0] = m_state.imu.quaternion[0];
     msg.imu.quaternion[1] = m_state.imu.quaternion[1];
     msg.imu.quaternion[2] = m_state.imu.quaternion[2];
     msg.imu.quaternion[3] = m_state.imu.quaternion[3];
-    
     msg.imu.gyroscope[0] = m_state.imu.gyroscope[0];
     msg.imu.gyroscope[1] = m_state.imu.gyroscope[1];
     msg.imu.gyroscope[2] = m_state.imu.gyroscope[2];
-    
     msg.imu.accelerometer[0] = m_state.imu.accelerometer[0];
     msg.imu.accelerometer[1] = m_state.imu.accelerometer[1];
     msg.imu.accelerometer[2] = m_state.imu.accelerometer[2];
-    
+    msg.imu.rpy[0] = m_state.imu.rpy[0];
+    msg.imu.rpy[1] = m_state.imu.rpy[1];
+    msg.imu.rpy[2] = m_state.imu.rpy[2];
     msg.imu.temperature = m_state.imu.temperature;
     
-    msg.forwardSpeed = m_state.forwardSpeed;
-    msg.sideSpeed = m_state.sideSpeed;
-    msg.rotateSpeed = m_state.rotateSpeed;
+    msg.gaitType = m_state.gaitType;
+    msg.footRaiseHeight = m_state.footRaiseHeight;
+    msg.position = m_state.position;
     msg.bodyHeight = m_state.bodyHeight;
-    msg.updownSpeed = m_state.updownSpeed;
-    msg.forwardPosition = m_state.forwardPosition;
-    msg.sidePosition = m_state.sidePosition;
+    msg.velocity = m_state.velocity;
+    msg.yawSpeed = m_state.yawSpeed;
     
     for ( int i = 0; i < 4; ++i )
     {
@@ -230,7 +230,6 @@ void AlienGoBridge::publishState()
         msg.footForceEst[i] = m_state.footForceEst[i];
     }
     
-    msg.tick = m_state.tick;               
     for ( int i = 0; i < 40; ++i )
         msg.wirelessRemote[i] = m_state.wirelessRemote[i];
     msg.reserve = m_state.reserve;
