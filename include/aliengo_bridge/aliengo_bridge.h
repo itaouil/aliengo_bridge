@@ -32,7 +32,8 @@ public:
 private:
     void UDPRecv();
     void UDPSend();
-    void RobotControl();
+    void control();
+    void resetCmd();
     void publishState();
     void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
 
@@ -44,11 +45,13 @@ private:
     HighState m_state = {0};
     xRockerBtnDataStruct _keyData;
 
-    float m_dt = 0.002;     // 0.001~0.01
+    float m_dt = 0.002;
     int m_motiontime = 0;
     int m_motion_timestep;
-    float m_lower_velocity = 0.0;
-    float m_higher_velocity = 0.1;
+
+    ros::Time m_last_joy_time;
+    float m_cmd_min_velocity = 0.0;
+    float m_cmd_max_velocity = 0.1;
     
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;
