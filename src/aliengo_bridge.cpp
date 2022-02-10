@@ -91,19 +91,19 @@ void AlienGoBridge::control()
     m_udp.GetRecv( m_state );
     m_state_mutex.unlock();
 
+    memcpy(&_keyData, m_state.wirelessRemote, 40);
+
     if ((ros::Time::now() - m_last_joy_time).toSec() > 1) 
     {
-        memcpy(&_keyData, m_state.wirelessRemote, 40);
+        // if((int)_keyData.btn.components.select == 1)
+        // {
+        //     m_cmd_max_velocity = 0.1;
+        //     m_cmd_min_velocity = 0.0; 
 
-        if((int)_keyData.btn.components.select == 1)
-        {
-            m_cmd_max_velocity = 0.1;
-            m_cmd_min_velocity = 0.0; 
-
-            m_last_joy_time = ros::Time::now();
-            std::cout << "Reset max and min velocities to: " << 0.1 << " and " << 0.0 << std::endl;
-        }
-        else if((int)_keyData.btn.components.Y == 1)
+        //     m_last_joy_time = ros::Time::now();
+        //     std::cout << "Reset max and min velocities to: " << 0.1 << " and " << 0.0 << std::endl;
+        // }
+        if((int)_keyData.btn.components.Y == 1)
         {
             if (m_cmd_max_velocity < 0.9)
                 m_cmd_max_velocity += 0.1;
@@ -137,10 +137,10 @@ void AlienGoBridge::control()
         }
     }
 
-    if (_keyData.ly > 0.95)
-    {
-        std::cout << "Sending fwd max velocity command: " << m_cmd_max_velocity << std::endl;
-    }
+    // if (_keyData.ly > 0.95)
+    // {
+    //     std::cout << "Sending fwd max velocity command: " <<  << m_cmd_max_velocity << std::endl;
+    // }
     // else if (_keyData.ly < -0.95)
     // {
     //     std::cout << "Sending bwd max velocity command: " << -m_cmd_min_velocity << std::endl;
@@ -237,6 +237,7 @@ void AlienGoBridge::publishState()
     
     for ( int i = 0; i < 40; ++i )
         msg.wirelessRemote[i] = m_state.wirelessRemote[i];
+
     msg.reserve = m_state.reserve;
     msg.crc = m_state.crc;
     
