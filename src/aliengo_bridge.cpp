@@ -59,7 +59,7 @@ void AlienGoBridge::UDPSend()
 
 void AlienGoBridge::resetCmd()
 {
-    cmd.mode = 1;               // 0. idle, default stand
+    m_cmd.mode = 1;               // 0. idle, default stand
                                 // 1. force stand (controlled by dBodyHeight + ypr)
                                 // 2. target velocity walking (controlled by velocity + yawSpeed)
                                 // 3. target position walking (controlled by position + ypr[0])
@@ -73,16 +73,16 @@ void AlienGoBridge::resetCmd()
                                 // 11. straightHand
                                 // 12. dance1
                                 // 13. dance2
-    cmd.gaitType = 0;           // 0.idle  1.trot  2.trot running  3.climb stair
-    cmd.euler[0] = 0;           // (unit: rad), roll in stand mode
-    cmd.euler[1] = 0;           // (unit: rad), pitch in stand mode
-    cmd.euler[2] = 0;           // (unit: rad), yaw in stand mode
-    cmd.speedLevel = 0;         // 0. default low speed. 1. medium speed 2. high speed. during walking, only respond MODE 3
-    cmd.bodyHeight = 0;         // (unit: m, default: 0.28m)
-    cmd.yawSpeed = 0.0f;        // (unit: rad/s), rotateSpeed in body frame
-    cmd.velocity[0] = 0.0f;     // (unit: m/s), forwardSpeed in body frame
-    cmd.velocity[1] = 0.0f;     // (unit: m/s), sideSpeed in body frame
-    cmd.footRaiseHeight = 0;    // (unit: m, default: 0.08m), foot up height while walking
+    m_cmd.gaitType = 0;           // 0.idle  1.trot  2.trot running  3.climb stair
+    m_cmd.euler[0] = 0;           // (unit: rad), roll in stand mode
+    m_cmd.euler[1] = 0;           // (unit: rad), pitch in stand mode
+    m_cmd.euler[2] = 0;           // (unit: rad), yaw in stand mode
+    m_cmd.speedLevel = 0;         // 0. default low speed. 1. medium speed 2. high speed. during walking, only respond MODE 3
+    m_cmd.bodyHeight = 0;         // (unit: m, default: 0.28m)
+    m_cmd.yawSpeed = 0.0f;        // (unit: rad/s), rotateSpeed in body frame
+    m_cmd.velocity[0] = 0.0f;     // (unit: m/s), forwardSpeed in body frame
+    m_cmd.velocity[1] = 0.0f;     // (unit: m/s), sideSpeed in body frame
+    m_cmd.footRaiseHeight = 0;    // (unit: m, default: 0.08m), foot up height while walking
 }
 
 void AlienGoBridge::control() 
@@ -211,9 +211,17 @@ void AlienGoBridge::publishState()
     
     msg.gaitType = m_state.gaitType;
     msg.footRaiseHeight = m_state.footRaiseHeight;
-    msg.position = m_state.position;
+
+    msg.position[0] = m_state.position[0];
+    msg.position[1] = m_state.position[1];
+    msg.position[2] = m_state.position[2];
+    
     msg.bodyHeight = m_state.bodyHeight;
-    msg.velocity = m_state.velocity;
+    
+    msg.velocity[0] = m_state.velocity[0];
+    msg.velocity[1] = m_state.velocity[1];
+    msg.velocity[2] = m_state.velocity[2];
+    
     msg.yawSpeed = m_state.yawSpeed;
     
     for ( int i = 0; i < 4; ++i )
