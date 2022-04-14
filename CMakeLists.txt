@@ -12,8 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   unitree_legged_msgs
 )
 
-set(CMAKE_CXX_STANDARD 11)
-
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -32,9 +30,11 @@ include_directories(
 
 link_directories(lib)
 
-set(EXTRA_LIBS -pthread libunitree_legged_sdk_amd64.so lcm)
+add_compile_options(-std=c++11)
 
-# set(CMAKE_CXX_FLAGS "-O3")
+set(EXTRA_LIBS -pthread libunitree_legged_sdk.so lcm)
+
+set(CMAKE_CXX_FLAGS "-O3 -fPIC")
 
 ## Declare a C++ executable
 add_executable(aliengo_bridge src/aliengo_bridge.cpp src/node.cpp)
