@@ -76,11 +76,11 @@ void Custom::RobotControl()
         last_update = ros::Time::now();
     }
     else {
-        joy_msg.buttons = [0, 0, 0];
+        joy_msg.buttons = {0, 0, 0};
     }
 
-    auto axes_on = std::count_if(joy_msg.axes.begin(), joy_msg.axes.end(),[&](auto const& val){ return val >= 0.2; });
-    auto btns_on = std::count_if(jjoy_msg.buttons.begin(), joy_msg.buttons.end(),[&](auto const& val){ return val >= 0.5; });
+    auto axes_on = std::count_if(joy_msg.axes.begin(), joy_msg.axes.end(),[&](float const& val){ return val >= 0.2; });
+    auto btns_on = std::count_if(joy_msg.buttons.begin(), joy_msg.buttons.end(),[&](int const& val){ return val >= 0.5; });
 
     if (btns_on || axes_on)
         joy_pub.publish(joy_msg);
