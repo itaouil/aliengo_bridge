@@ -26,7 +26,7 @@ constexpr char TARGET_IP[] = "192.168.123.220";   // target IP address
 class Custom
 {
 public:
-    Custom(uint8_t level): safe(LeggedType::Aliengo),
+    Custom(uint8_t level, ros::NodeHandle nh): safe(LeggedType::Aliengo), nh(nh),
         udp(LOCAL_PORT, TARGET_IP,TARGET_PORT, sizeof(HighCmd), sizeof(HighState))
     {
         udp.InitCmdData(cmd);
@@ -44,8 +44,8 @@ public:
     xRockerBtnDataStruct _keyData;
 
     ros::NodeHandle nh;
-    ros::Time last_update;
     sensor_msgs::Joy joy_msg;
+    ros::Time last_update = ros::Time::now();
     ros::Publisher joy_pub = nh.advertise< sensor_msgs::Joy >( "joy", 1 );
 };
 
@@ -88,10 +88,12 @@ void Custom::RobotControl()
 
 int main(void)
 {
+    ros::init( argc, argv, "aliengo_joystick" );
     std::cout << "Communication level is set to HIGH-level." << std::endl
               << "WARNING: Make sure the robot is standing on the ground." << std::endl
               << "Press Enter to continue..." << std::endl;
     std::cin.ignore();
+    ros::NodeHandle ph( "~" );
 
     Custom custom(HIGHLEVEL);
     InitEnvironment();
