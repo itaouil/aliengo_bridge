@@ -68,7 +68,7 @@ void Custom::RobotControl()
 
     joy_msg.heade.stamp = ros::Time::now();
     joy_msg.axes = [_keyData.lx, _keyData.ly, _keyData.rx, _keyData.ry];
-    if ((ros::Time::now() - m_last_joy_time).toSec() > 1) 
+    if ((ros::Time::now() - last_update).toSec() > 1) 
     {
         joy_msg.buttons = [((int)_keyData.btn.components.up == 1),
                         ((int)_keyData.btn.components.down == 1),
