@@ -15,8 +15,6 @@
 #include <sensor_msgs/JointState.h>
 
 // Unitree
-#include <unitree_legged_msgs/HighCmd.h>
-#include <unitree_legged_msgs/HighState.h>
 #include "unitree_legged_sdk/unitree_joystick.h"
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 
