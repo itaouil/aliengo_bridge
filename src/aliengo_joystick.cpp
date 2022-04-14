@@ -46,7 +46,7 @@ public:
     ros::NodeHandle nh;
     ros::Time last_update;
     sensor_msgs::Joy joy_msg;
-    ros::Publisher joy_pub = ph.advertise< sensor_msgs::Joy >( "joy", 1 );
+    ros::Publisher joy_pub = nh.advertise< sensor_msgs::Joy >( "joy", 1 );
 };
 
 void Custom::UDPRecv()
@@ -66,13 +66,13 @@ void Custom::RobotControl()
 	
     memcpy(&_keyData, state.wirelessRemote, 40);
 
-    joy_msg.heade.stamp = ros::Time::now();
-    joy_msg.axes = [_keyData.lx, _keyData.ly, _keyData.rx, _keyData.ry];
+    joy_msg.header.stamp = ros::Time::now();
+    joy_msg.axes = {_keyData.lx, _keyData.ly, _keyData.rx, _keyData.ry};
     if ((ros::Time::now() - last_update).toSec() > 1) 
     {
-        joy_msg.buttons = [((int)_keyData.btn.components.up == 1),
+        joy_msg.buttons = {((int)_keyData.btn.components.up == 1),
                         ((int)_keyData.btn.components.down == 1),
-                        ((int)_keyData.btn.components.select == 1)];
+                        ((int)_keyData.btn.components.select == 1)};
         last_update = ros::Time::now();
     }
     else {
