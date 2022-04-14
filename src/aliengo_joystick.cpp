@@ -79,23 +79,19 @@ void Custom::RobotControl()
         joy_msg.buttons = {0, 0, 0};
     }
 
-    auto axes_on = std::count_if(joy_msg.axes.begin(), joy_msg.axes.end(),[&](float const& val){ return val >= 0.2; });
-    auto btns_on = std::count_if(joy_msg.buttons.begin(), joy_msg.buttons.end(),[&](int const& val){ return val >= 0.5; });
-
-    if (btns_on || axes_on)
-        joy_pub.publish(joy_msg);
+    joy_pub.publish(joy_msg);
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
     ros::init( argc, argv, "aliengo_joystick" );
     std::cout << "Communication level is set to HIGH-level." << std::endl
               << "WARNING: Make sure the robot is standing on the ground." << std::endl
               << "Press Enter to continue..." << std::endl;
     std::cin.ignore();
-    ros::NodeHandle ph( "~" );
+    ros::NodeHandle nh( "~" );
 
-    Custom custom(HIGHLEVEL);
+    Custom custom(HIGHLEVEL, nh);
     InitEnvironment();
     LoopFunc loop_control("control_loop", custom.dt,    boost::bind(&Custom::RobotControl, &custom));
     LoopFunc loop_udpSend("udp_send",     custom.dt, 3, boost::bind(&Custom::UDPSend,      &custom));
