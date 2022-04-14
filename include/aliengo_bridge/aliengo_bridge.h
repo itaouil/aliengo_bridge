@@ -35,6 +35,7 @@ private:
     void control();
     void resetCmd();
     void publishState();
+    void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
 
     ros::NodeHandle m_ph;
@@ -58,6 +59,7 @@ private:
     LoopFunc m_loop_udpRecv;
     
     ros::Subscriber m_cmd_sub;
+    ros::Subscriber m_joy_sub;
     ros::Publisher m_state_pub;
     
     ros::Time m_last_cmd_time;
