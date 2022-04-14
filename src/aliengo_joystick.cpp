@@ -45,7 +45,6 @@ public:
 
     ros::NodeHandle nh;
     sensor_msgs::Joy joy_msg;
-    ros::Time last_update = ros::Time::now();
     ros::Publisher joy_pub = nh.advertise< sensor_msgs::Joy >( "joy", 1 );
 };
 
@@ -68,17 +67,9 @@ void Custom::RobotControl()
 
     joy_msg.header.stamp = ros::Time::now();
     joy_msg.axes = {_keyData.lx, _keyData.ly, _keyData.rx, _keyData.ry};
-    if ((ros::Time::now() - last_update).toSec() > 1) 
-    {
-        joy_msg.buttons = {((int)_keyData.btn.components.up == 1),
-                        ((int)_keyData.btn.components.down == 1),
-                        ((int)_keyData.btn.components.select == 1)};
-        last_update = ros::Time::now();
-    }
-    else {
-        joy_msg.buttons = {0, 0, 0};
-    }
-
+    joy_msg.buttons = {((int)_keyData.btn.components.up == 1),
+                       ((int)_keyData.btn.components.down == 1),
+                       ((int)_keyData.btn.components.select == 1)};
     joy_pub.publish(joy_msg);
 }
 
