@@ -66,7 +66,6 @@ private:
     
     boost::mutex m_cmd_mutex;
     boost::mutex m_state_mutex;
-    
 };
 
 }

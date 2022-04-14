@@ -20,9 +20,6 @@ namespace aliengo_bridge
         m_udp.InitCmdData(m_cmd);
         m_motion_timestep = static_cast<int>( 1000 * m_dt );
         
-        // Leave it commented
-        //InitEnvironment();
-        
         m_loop_udpSend.start();
         m_loop_udpRecv.start();
         m_loop_control.start();
