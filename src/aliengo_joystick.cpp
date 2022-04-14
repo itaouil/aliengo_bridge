@@ -44,6 +44,7 @@ public:
     xRockerBtnDataStruct _keyData;
 
     ros::NodeHandle nh;
+    ros::Time last_update;
     sensor_msgs::Joy joy_msg;
     ros::Publisher joy_pub = ph.advertise< sensor_msgs::Joy >( "joy", 1 );
 };
@@ -67,10 +68,18 @@ void Custom::RobotControl()
 
     joy_msg.heade.stamp = ros::Time::now();
     joy_msg.axes = [_keyData.lx, _keyData.ly, _keyData.rx, _keyData.ry];
-    joy_msg.buttons = [(int)_keyData.btn.components.up,
-                       (int)_keyData.btn.components.down];
+    if ((ros::Time::now() - m_last_joy_time).toSec() > 1) 
+    {
+        joy_msg.buttons = [((int)_keyData.btn.components.up == 1),
+                        ((int)_keyData.btn.components.down == 1),
+                        ((int)_keyData.btn.components.select == 1)];
+        last_update = ros::Time::now();
+    }
+    else {
+        joy_msg.buttons = [0, 0, 0];
+    }
 
-    auto axes_on = std::count_if(joy_msg.axes.begin(), joy_msg.axes.end(),[&](auto const& val){ return val >= 0.7; });
+    auto axes_on = std::count_if(joy_msg.axes.begin(), joy_msg.axes.end(),[&](auto const& val){ return val >= 0.2; });
     auto btns_on = std::count_if(jjoy_msg.buttons.begin(), joy_msg.buttons.end(),[&](auto const& val){ return val >= 0.5; });
 
     if (btns_on || axes_on)
