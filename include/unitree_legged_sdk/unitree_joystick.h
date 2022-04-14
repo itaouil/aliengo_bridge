@@ -35,9 +35,8 @@ typedef struct {
     float lx;
     float rx;
     float ry;
-    float L2;
+    float reserve;
     float ly;
-
     uint8_t idle[16];
 } xRockerBtnDataStruct;
 

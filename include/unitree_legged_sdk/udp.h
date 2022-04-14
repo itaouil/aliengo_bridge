@@ -6,7 +6,7 @@
 #define _UNITREE_LEGGED_UDP_H_
 
 #include "comm.h"
-#include "unitree_legged_sdk/quadruped.h"
+#include "quadruped.h"
 #include <pthread.h>
 
 namespace UNITREE_LEGGED_SDK
@@ -26,9 +26,7 @@ namespace UNITREE_LEGGED_SDK
         ~UDP();
         void InitCmdData(HighCmd& cmd);
         void InitCmdData(LowCmd& cmd);
-        void SwitchLevel(int level);
-        void SetDisconnectTime(float callback_dt, float disconnectTime);  // disconnect for another IP to connect
-        void SetAccessibleTime(float callback_dt, float accessibleTime);  // if can access data
+        void switchLevel(int level);
 
 		int SetSend(HighCmd&);
         int SetSend(LowCmd&);
@@ -44,16 +42,16 @@ namespace UNITREE_LEGGED_SDK
         uint16_t targetPort;
         char*    localIP;
         uint16_t localPort;
-        bool accessible = false;         // can access or not
-        int useTimeOut = -1;             // use time out method or not, (unit: ms)
-        bool isServer = false;           // server mode with changeable IP/port. SetDisconnectTime() will set this true.
+        bool accessible;       // can access or not
+        int useTimeOut;        // use time out method or not, (unit: ms)
+        bool isServer;         // server mode need not connected, use for circumstances that data from internet with changeable IP/port
 
     private:
         void init(uint16_t localPort, const char* targetIP, uint16_t targetPort);
         
         uint8_t levelFlag = HIGHLEVEL;   // default: high level
         int sockFd;
-        bool connected;                  // udp works with connect() function, rather than server mode
+        bool connected; // udp works with connected, rather than server mode
         int sendLength;
         int recvLength;
         char* recvBuf;
