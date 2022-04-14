@@ -36,6 +36,10 @@ set(EXTRA_LIBS -pthread libunitree_legged_sdk.so lcm)
 
 set(CMAKE_CXX_FLAGS "-O3 -fPIC")
 
-## Declare a C++ executable
+# Bridge executable
 add_executable(aliengo_bridge src/aliengo_bridge.cpp src/node.cpp)
 target_link_libraries(aliengo_bridge ${catkin_LIBRARIES} ${EXTRA_LIBS})
+
+# Joystick executable
+add_executable(aliengo_joystick src/aliengo_joystick.cpp)
+target_link_libraries(aliengo_joystick ${catkin_LIBRARIES} ${EXTRA_LIBS})
