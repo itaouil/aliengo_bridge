@@ -47,7 +47,7 @@ private:
     HighState m_state = {0};
 
     xRockerBtnDataStruct m_joy;
-    ros::Time m_last_joy_update;
+    ros::Time m_last_velocity_update;
 
     float m_dt = 0.002;
     int m_motiontime = 0;
@@ -55,7 +55,7 @@ private:
 
     ros::Time m_last_joy_time;
     float m_cmd_min_velocity = 0.0;
-    float m_cmd_max_velocity = 0.1;
+    float m_cmd_max_velocity = 0.0;
     
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;

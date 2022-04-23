@@ -14,7 +14,7 @@ namespace aliengo_bridge
     {
         // Timers
         m_last_cmd_time = ros::Time::now();
-        m_last_joy_update = ros::Time::now();
+        m_last_velocity_update = ros::Time::now();
 
         // ROS
         m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
@@ -202,25 +202,25 @@ namespace aliengo_bridge
         memcpy(&m_joy, m_state.wirelessRemote, 40);
 
         // Update velocities every second otherwise values increase too quick
-        if ((ros::Time::now() - m_last_joy_update).toSec() > 1.)
+        if ((ros::Time::now() - m_last_velocity_update).toSec() > 1.)
         {
             if (((int)m_joy.btn.components.up == 1) && m_cmd_max_velocity < 1.0) 
             {
                 m_cmd_max_velocity += 0.1;
                 ROS_INFO_STREAM("Increased max velocity by 0.1 to " << m_cmd_max_velocity);
-                m_last_joy_update = ros::Time::now();
+                m_last_velocity_update = ros::Time::now();
             }
             else if (((int)m_joy.btn.components.down == 1) && m_cmd_max_velocity > 0.1)
             {
                 m_cmd_max_velocity -= 0.1;
                 ROS_INFO_STREAM("Decreased max velocity by 0.1 to " << m_cmd_max_velocity);
-                m_last_joy_update = ros::Time::now();
+                m_last_velocity_update = ros::Time::now();
             }
             else if (((int)m_joy.btn.components.select == 1))
             {
-                m_cmd_max_velocity = 0.1;
+                m_cmd_max_velocity = 0.0;
                 ROS_INFO_STREAM("Reset max velocity to " << m_cmd_max_velocity);
-                m_last_joy_update = ros::Time::now();
+                m_last_velocity_update = ros::Time::now();
             }
         }
 
@@ -257,17 +257,24 @@ namespace aliengo_bridge
         if (m_joy.ly > 0.5)
         {
             ROS_INFO_STREAM("Sending forward cmd with max speed of " << m_cmd_max_velocity);
-            // m_cmd.velocity[0] = m_cmd_max_velocity;
+            m_cmd.velocity[0] = m_cmd_max_velocity;
         }
         else if (m_joy.rx > 0.5)
         {
             ROS_INFO_STREAM("Sending clockwise cmd with max speed of " << m_cmd_max_velocity);
-            // m_cmd.yawSpeed = m_cmd_max_velocity;
+            m_cmd.yawSpeed = m_cmd_max_velocity;
         }
         else if (m_joy.rx < -0.5)
         {
             ROS_INFO_STREAM("Sending counter-clockwise cmd with max speed of " << m_cmd_max_velocity);
-            // m_cmd.yawSpeed = -m_cmd_max_velocity;
+            m_cmd.yawSpeed = -m_cmd_max_velocity;
+        }
+
+        // Send command
+        if (m_joy.ly > 0.5 || m_joy.rx > 0.5 || m_joy.rx < -0.5)
+        {
+            m_received_cmd = true;
+            m_last_cmd_time = ros::Time::now();
         }
     }
 }
