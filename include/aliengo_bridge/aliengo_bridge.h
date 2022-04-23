@@ -46,8 +46,8 @@ private:
     HighCmd m_cmd = {0};
     HighState m_state = {0};
 
-    float m_last_joy_update;
     xRockerBtnDataStruct m_joy;
+    ros::Time m_last_joy_update;
 
     float m_dt = 0.002;
     int m_motiontime = 0;
