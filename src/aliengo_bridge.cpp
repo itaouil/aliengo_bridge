@@ -73,7 +73,7 @@ namespace aliengo_bridge
 
     void AlienGoBridge::resetCmd()
     {
-        m_cmd.mode = 0; // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
+        m_cmd.mode = 2; // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
                         // 2.target velocity walking (controlled by velocity + yawSpeed)
                         // 3.target position walking (controlled by position + rpy[2])
                         // 4. path mode walking (reserve for future release)
@@ -82,7 +82,7 @@ namespace aliengo_bridge
                         // 7. damping mode 
                         // 8. recovery mode
         
-        m_cmd.gaitType = 2; // 0.trot | 1. trot running  | 2.climb stair
+        m_cmd.gaitType = 0; // 0.trot | 1. trot running  | 2.climb stair
 
         m_cmd.speedLevel = 0; // 0. default low speed. 1. medium speed 2. high speed. during walking
         
