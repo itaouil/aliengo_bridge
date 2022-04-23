@@ -257,6 +257,8 @@ namespace aliengo_bridge
             else if (((int)m_joy.btn.components.select == 1))
             {
                 m_received_cmd = !m_received_cmd;
+                ROS_INFO_STREAM("Received command flag toggled " << m_received_cmd);
+                m_last_velocity_update = ros::Time::now();
             }
         }
     }
