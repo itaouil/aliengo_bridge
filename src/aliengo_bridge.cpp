@@ -117,7 +117,7 @@ namespace aliengo_bridge
         // reset cmd after timeout
         else if ((ros::Time::now() - m_last_cmd_time).toSec() > m_cmd_timeout)
         {
-            ROS_WARN_STREAM( "Cmd timed out." );
+            ROS_WARN_STREAM_THROTTLE( 5, "Cmd timed out." );
             resetCmd();
         }
         
