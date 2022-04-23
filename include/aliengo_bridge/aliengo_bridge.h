@@ -35,6 +35,7 @@ private:
     void control();
     void resetCmd();
     void publishState();
+    void joystickUpdate();
     void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
 
@@ -44,7 +45,7 @@ private:
     Safety m_safe;
     HighCmd m_cmd = {0};
     HighState m_state = {0};
-    xRockerBtnDataStruct _keyData;
+    xRockerBtnDataStruct m_joy;
 
     float m_dt = 0.002;
     int m_motiontime = 0;

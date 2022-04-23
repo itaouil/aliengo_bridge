@@ -13,7 +13,6 @@ namespace aliengo_bridge
     , m_loop_udpRecv("udp_recv", m_dt, 3, boost::bind(&AlienGoBridge::UDPRecv, this))
     {
         // ROS
-        m_joy_sub = ph.subscribe( "joy", 1, &AlienGoBridge::joyCallback, this );
         m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
         m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "high_state", 1 );
         
@@ -25,21 +24,6 @@ namespace aliengo_bridge
         m_loop_udpRecv.start();
         m_loop_control.start();
     }
-
-    void AlienGoBridge::joyCallback(const sensor_msgs::Joy::ConstPtr& msg) {
-        boost::mutex::scoped_lock lock(m_cmd_mutex);
-        m_last_cmd_time = msg->header.stamp;
-
-        if (msg->buttons[0] && m_cmd_max_velocity < 1.0)
-            m_cmd_max_velocity += 0.1;
-        else if (msg->buttons[1] && m_cmd_max_velocity > 0.1)
-            m_cmd_max_velocity -= 0.1;
-        
-        ROS_INFO_STREAM("Publishing max velocity: " << m_cmd_max_velocity);
-
-        m_received_cmd = true;
-    }
-
 
     void AlienGoBridge::cmdCallback( const unitree_legged_msgs::HighCmd& cmd )
     {
@@ -72,8 +56,6 @@ namespace aliengo_bridge
         m_received_cmd = true;
         m_last_cmd_time = ros::Time::now();
     }
-
-
 
     void AlienGoBridge::UDPRecv()
     {
@@ -136,6 +118,7 @@ namespace aliengo_bridge
         m_cmd_mutex.unlock();
         
         publishState();
+        joystickUpdate();
     }
 
     void AlienGoBridge::publishState()
@@ -202,5 +185,28 @@ namespace aliengo_bridge
         msg.crc = m_state.crc;
         
         m_state_pub.publish( msg );
+    }
+
+    void AlienGoBridge::joystickUpdate()
+    {
+        boost::mutex::scoped_lock lock(m_state_mutex);
+        
+        memcpy(&m_joy, m_state.wirelessRemote, 40);
+
+        if (((int)m_joy.btn.components.up == 1) && m_cmd_max_velocity < 1.0) 
+        {
+            m_cmd_max_velocity += 0.1;
+            ROS_INFO_STREAM("Increased max velocity by 0.1 to " << m_cmd_max_velocity);
+        }
+        else if(((int)_keyData.btn.components.down == 1) && m_cmd_max_velocity > 0.0)
+        {
+            m_cmd_max_velocity -= 0.1;
+            ROS_INFO_STREAM("Decreased max velocity by 0.1 to " << m_cmd_max_velocity);
+        }
+        else if(((int)_keyData.btn.components.select == 1))
+        {
+            m_cmd_max_velocity = 0.1;
+            ROS_INFO_STREAM("Reset max velocity to " << m_cmd_max_velocity);
+        }
     }
 }
