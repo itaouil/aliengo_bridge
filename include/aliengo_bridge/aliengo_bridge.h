@@ -45,6 +45,8 @@ private:
     Safety m_safe;
     HighCmd m_cmd = {0};
     HighState m_state = {0};
+
+    float m_last_joy_update;
     xRockerBtnDataStruct m_joy;
 
     float m_dt = 0.002;

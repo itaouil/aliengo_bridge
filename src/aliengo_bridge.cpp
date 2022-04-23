@@ -190,6 +190,12 @@ namespace aliengo_bridge
     void AlienGoBridge::joystickUpdate()
     {
         boost::mutex::scoped_lock lock(m_state_mutex);
+
+        // Update every second otherwise values increase too quick
+        if ((ros::Time::now() - m_last_joy_update).toSec() < 1.) 
+        {
+            return;
+        }
         
         memcpy(&m_joy, m_state.wirelessRemote, 40);
 
@@ -208,5 +214,7 @@ namespace aliengo_bridge
             m_cmd_max_velocity = 0.1;
             ROS_INFO_STREAM("Reset max velocity to " << m_cmd_max_velocity);
         }
+
+        m_last_joy_update = ros::Time::now();
     }
 }
