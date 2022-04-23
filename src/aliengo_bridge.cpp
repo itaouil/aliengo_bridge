@@ -218,7 +218,7 @@ namespace aliengo_bridge
             }
             else if (((int)m_joy.btn.components.select == 1))
             {
-                m_cmd_max_velocity = 0.0;
+                m_cmd_max_velocity = 0.0f;
                 ROS_INFO_STREAM("Reset max velocity to " << m_cmd_max_velocity);
                 m_last_velocity_update = ros::Time::now();
             }
@@ -259,14 +259,14 @@ namespace aliengo_bridge
             ROS_INFO_STREAM("Sending forward cmd with max speed of " << m_cmd_max_velocity);
             m_cmd.velocity[0] = m_cmd_max_velocity;
         }
-        else if (m_joy.rx > 0.5)
+        else if (m_joy.lx > 0.5)
         {
             ROS_INFO_STREAM("Sending clockwise cmd with max speed of " << m_cmd_max_velocity);
             m_cmd.yawSpeed = m_cmd_max_velocity;
         }
-        else if (m_joy.rx < -0.5)
+        else if (m_joy.lx < -0.5)
         {
-            ROS_INFO_STREAM("Sending counter-clockwise cmd with max speed of " << m_cmd_max_velocity);
+            ROS_INFO_STREAM("Sending counter-clockwise cmd with max speed of " << -m_cmd_max_velocity);
             m_cmd.yawSpeed = -m_cmd_max_velocity;
         }
 
