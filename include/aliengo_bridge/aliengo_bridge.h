@@ -33,6 +33,7 @@ private:
     void UDPRecv();
     void UDPSend();
     void control();
+    void setCmd();
     void resetCmd();
     void publishState();
     void joystickUpdate();
