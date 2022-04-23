@@ -32,7 +32,7 @@ namespace aliengo_bridge
     void AlienGoBridge::cmdCallback( const unitree_legged_msgs::HighCmd& cmd )
     {
         boost::mutex::scoped_lock lock(m_cmd_mutex);
-        m_cmd.mode = cmd.mode;    // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
+        m_cmd.mode = cmd.mode;  // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
                                 // 2.target velocity walking (controlled by velocity + yawSpeed)
                                 // 3.target position walking (controlled by position + rpy[2])
                                 // 4. path mode walking (reserve for future release)
@@ -73,11 +73,14 @@ namespace aliengo_bridge
 
     void AlienGoBridge::resetCmd()
     {
-        m_cmd.mode = 0;           // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
-                                // 2.target velocity walking (controlled by velocity + yawSpeed)
-                                // 3.target position walking (controlled by position + rpy[2])
-                                // 4. path mode walking (reserve for future release)
-                                // 5. position stand down. |6. position stand up |7. damping mode | 8. recovery mode
+        m_cmd.mode = 0; // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
+                        // 2.target velocity walking (controlled by velocity + yawSpeed)
+                        // 3.target position walking (controlled by position + rpy[2])
+                        // 4. path mode walking (reserve for future release)
+                        // 5. position stand down. 
+                        // 6. position stand up 
+                        // 7. damping mode 
+                        // 8. recovery mode
         
         m_cmd.gaitType = 2; // 0.trot | 1. trot running  | 2.climb stair
 
@@ -96,7 +99,7 @@ namespace aliengo_bridge
 
         m_cmd.velocity[0] = 0.0f; // (unit: m/s), forwardSpeed in body frame.
         m_cmd.velocity[1] = 0.0f; // (unit: m/s), sideSpeed in body frame.
-        m_cmd.yawSpeed = 0.0f;    // (unit: rad/s), rotateSpeed in body frame.
+        m_cmd.yawSpeed = 0.0f; // (unit: rad/s), rotateSpeed in body frame.
     }
 
     void AlienGoBridge::control() 
@@ -193,34 +196,78 @@ namespace aliengo_bridge
 
     void AlienGoBridge::joystickUpdate()
     {
-        boost::mutex::scoped_lock lock(m_state_mutex);
-
-        // Update every second otherwise values increase too quick
-        if ((ros::Time::now() - m_last_joy_update).toSec() < 1.) 
-        {
-            return;
-        }
+        boost::mutex::scoped_lock cmd_lock(m_cmd_mutex);
+        boost::mutex::scoped_lock state_lock(m_state_mutex);
         
         memcpy(&m_joy, m_state.wirelessRemote, 40);
 
-        if (((int)m_joy.btn.components.up == 1) && m_cmd_max_velocity < 1.0) 
+        // Update velocities every second otherwise values increase too quick
+        if ((ros::Time::now() - m_last_joy_update).toSec() > 1.)
         {
-            m_cmd_max_velocity += 0.1;
-            ROS_INFO_STREAM("Increased max velocity by 0.1 to " << m_cmd_max_velocity);
-            m_last_joy_update = ros::Time::now();
+            if (((int)m_joy.btn.components.up == 1) && m_cmd_max_velocity < 1.0) 
+            {
+                m_cmd_max_velocity += 0.1;
+                ROS_INFO_STREAM("Increased max velocity by 0.1 to " << m_cmd_max_velocity);
+                m_last_joy_update = ros::Time::now();
+            }
+            else if (((int)m_joy.btn.components.down == 1) && m_cmd_max_velocity > 0.1)
+            {
+                m_cmd_max_velocity -= 0.1;
+                ROS_INFO_STREAM("Decreased max velocity by 0.1 to " << m_cmd_max_velocity);
+                m_last_joy_update = ros::Time::now();
+            }
+            else if (((int)m_joy.btn.components.select == 1))
+            {
+                m_cmd_max_velocity = 0.1;
+                ROS_INFO_STREAM("Reset max velocity to " << m_cmd_max_velocity);
+                m_last_joy_update = ros::Time::now();
+            }
         }
-        else if(((int)m_joy.btn.components.down == 1) && m_cmd_max_velocity > 0.1)
-        {
-            m_cmd_max_velocity -= 0.1;
-            ROS_INFO_STREAM("Decreased max velocity by 0.1 to " << m_cmd_max_velocity);
-            m_last_joy_update = ros::Time::now();
-        }
-        else if(((int)m_joy.btn.components.select == 1))
-        {
-            m_cmd_max_velocity = 0.1;
-            ROS_INFO_STREAM("Reset max velocity to " << m_cmd_max_velocity);
-            m_last_joy_update = ros::Time::now();
-        }
+
+        // cmd message to send
+        m_cmd.mode = 2; // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
+                        // 2.target velocity walking (controlled by velocity + yawSpeed)
+                        // 3.target position walking (controlled by position + rpy[2])
+                        // 4. path mode walking (reserve for future release)
+                        // 5. position stand down. 
+                        // 6. position stand up 
+                        // 7. damping mode 
+                        // 8. recovery mode
         
+        m_cmd.gaitType = 0; // 0.trot | 1. trot running  | 2.climb stair
+
+        m_cmd.speedLevel = 0; // 0. default low speed. 1. medium speed 2. high speed. during walking
+        
+        m_cmd.dFootRaiseHeight = 0.0f; // (unit: m), swing foot height adjustment from default swing height.
+
+        m_cmd.dBodyHeight = 0.0f; // (unit: m), body height adjustment from default body height.
+
+        m_cmd.position[0] = 0.0f; // (unit: m), desired x in inertial frame.
+        m_cmd.position[1] = 0.0f; // (unit: m), y position in inertial frame.
+
+        m_cmd.rpy[0] = 0.0f; // (unit: rad), desired roll euler angle
+        m_cmd.rpy[1] = 0.0f; // (unit: rad), desired pitch euler angle
+        m_cmd.rpy[2] = 0.0f; // (unit: rad), desired yaw euler angle
+
+        m_cmd.velocity[0] = 0.0f; // (unit: m/s), forwardSpeed in body frame.
+        m_cmd.velocity[1] = 0.0f; // (unit: m/s), sideSpeed in body frame.
+        m_cmd.yawSpeed = 0.0f; // (unit: rad/s), rotateSpeed in body frame.
+
+        // Adjust velocity based on motion
+        if (m_joy.lx > 0.5)
+        {
+            ROS_INFO_STREAM("Sending forward cmd with max speed of " << m_cmd_max_velocity);
+            // m_cmd.velocity[0] = m_cmd_max_velocity;
+        }
+        else if (m_joy.ry > 0.5)
+        {
+            ROS_INFO_STREAM("Sending clockwise cmd with max speed of " << m_cmd_max_velocity);
+            // m_cmd.yawSpeed = m_cmd_max_velocity;
+        }
+        else if (m_joy.ry < -0.5)
+        {
+            ROS_INFO_STREAM("Sending counter-clockwise cmd with max speed of " << m_cmd_max_velocity);
+            // m_cmd.yawSpeed = -m_cmd_max_velocity;
+        }
     }
 }
