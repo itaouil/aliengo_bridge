@@ -207,18 +207,20 @@ namespace aliengo_bridge
         {
             m_cmd_max_velocity += 0.1;
             ROS_INFO_STREAM("Increased max velocity by 0.1 to " << m_cmd_max_velocity);
+            m_last_joy_update = ros::Time::now();
         }
         else if(((int)m_joy.btn.components.down == 1) && m_cmd_max_velocity > 0.0)
         {
             m_cmd_max_velocity -= 0.1;
             ROS_INFO_STREAM("Decreased max velocity by 0.1 to " << m_cmd_max_velocity);
+            m_last_joy_update = ros::Time::now();
         }
         else if(((int)m_joy.btn.components.select == 1))
         {
             m_cmd_max_velocity = 0.1;
             ROS_INFO_STREAM("Reset max velocity to " << m_cmd_max_velocity);
+            m_last_joy_update = ros::Time::now();
         }
-
-        m_last_joy_update = ros::Time::now();
+        
     }
 }
