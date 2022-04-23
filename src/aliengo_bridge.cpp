@@ -12,6 +12,10 @@ namespace aliengo_bridge
     , m_loop_udpSend("udp_send", m_dt, 3, boost::bind(&AlienGoBridge::UDPSend, this))
     , m_loop_udpRecv("udp_recv", m_dt, 3, boost::bind(&AlienGoBridge::UDPRecv, this))
     {
+        // Timers
+        m_last_cmd_time = ros::Time::now();
+        m_last_joy_update = ros::Time::now();
+
         // ROS
         m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
         m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "high_state", 1 );
