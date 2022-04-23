@@ -254,17 +254,17 @@ namespace aliengo_bridge
         m_cmd.yawSpeed = 0.0f; // (unit: rad/s), rotateSpeed in body frame.
 
         // Adjust velocity based on motion
-        if (m_joy.lx > 0.5)
+        if (m_joy.ly > 0.5)
         {
             ROS_INFO_STREAM("Sending forward cmd with max speed of " << m_cmd_max_velocity);
             // m_cmd.velocity[0] = m_cmd_max_velocity;
         }
-        else if (m_joy.ry > 0.5)
+        else if (m_joy.rx > 0.5)
         {
             ROS_INFO_STREAM("Sending clockwise cmd with max speed of " << m_cmd_max_velocity);
             // m_cmd.yawSpeed = m_cmd_max_velocity;
         }
-        else if (m_joy.ry < -0.5)
+        else if (m_joy.rx < -0.5)
         {
             ROS_INFO_STREAM("Sending counter-clockwise cmd with max speed of " << m_cmd_max_velocity);
             // m_cmd.yawSpeed = -m_cmd_max_velocity;
