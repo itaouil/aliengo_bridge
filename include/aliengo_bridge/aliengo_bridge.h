@@ -35,6 +35,7 @@ private:
     void control();
     void setCmd();
     void resetCmd();
+    void publishCmd();
     void publishState();
     void joystickUpdate();
     void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
@@ -62,7 +63,6 @@ private:
     LoopFunc m_loop_udpRecv;
     
     ros::Publisher m_cmd_pub;
-    ros::Subscriber m_cmd_sub;
     ros::Publisher m_state_pub;
     
     ros::Time m_last_cmd_time;
