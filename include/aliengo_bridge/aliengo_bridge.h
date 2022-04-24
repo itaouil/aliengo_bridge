@@ -47,16 +47,15 @@ private:
     HighCmd m_cmd = {0};
     HighState m_state = {0};
 
-    xRockerBtnDataStruct m_joy;
-    ros::Time m_last_velocity_update;
-
     float m_dt = 0.002;
     int m_motiontime = 0;
     int m_motion_timestep;
 
-    ros::Time m_last_joy_time;
+    xRockerBtnDataStruct m_joy;
+    uint8_t m_cmd_speed_level = 0;
     float m_cmd_min_velocity = 0.0;
     float m_cmd_max_velocity = 0.0;
+    ros::Time m_last_velocity_update;
     
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;
@@ -76,4 +75,3 @@ private:
 
 }
 #endif
-

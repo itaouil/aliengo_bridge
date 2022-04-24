@@ -118,9 +118,9 @@ namespace aliengo_bridge
         
         m_cmd.gaitType = 0; // 0.trot | 1. trot running  | 2.climb stair
 
-        m_cmd.speedLevel = 0; // 0. default low speed. 1. medium speed 2. high speed. during walking
+        m_cmd.speedLevel = m_cmd_speed_level; // 0. default low speed. 1. medium speed 2. high speed. during walking
         
-        m_cmd.dFootRaiseHeight = 0.0f; // (unit: m), swing foot height adjustment from default swing height.
+        m_cmd.dFootRaiseHeight = 0.06f; // (unit: m), swing foot height adjustment from default swing height.
 
         m_cmd.dBodyHeight = 0.0f; // (unit: m), body height adjustment from default body height.
 
@@ -131,7 +131,7 @@ namespace aliengo_bridge
         m_cmd.rpy[1] = 0.0f; // (unit: rad), desired pitch euler angle
         m_cmd.rpy[2] = 0.0f; // (unit: rad), desired yaw euler angle
 
-        m_cmd.velocity[0] = 0.1f; // (unit: m/s), forwardSpeed in body frame.
+        m_cmd.velocity[0] = m_cmd_max_velocity; // (unit: m/s), forwardSpeed in body frame.
         m_cmd.velocity[1] = 0.0f; // (unit: m/s), sideSpeed in body frame.
         m_cmd.yawSpeed = 0.0f; // (unit: rad/s), rotateSpeed in body frame.
     }
@@ -248,10 +248,23 @@ namespace aliengo_bridge
                 ROS_INFO_STREAM("Decreased max velocity by 0.1: " << m_cmd_max_velocity);
                 m_last_velocity_update = ros::Time::now();
             }
+            else if (((int)m_joy.btn.components.Y == 1) && m_cmd_speed_level < 2)
+            {
+                m_cmd_speed_lavel += 1;
+                ROS_INFO_STREAM("Increased speed level by 1 to: " << m_cmd_speed_lavel);
+                m_last_velocity_update = ros::Time::now();
+            }
+            else if (((int)m_joy.btn.components.A == 1) && m_cmd_speed_level > 0)
+            {
+                m_cmd_speed_lavel -= 1;
+                ROS_INFO_STREAM("Decreased speed level by 1 to: " << m_cmd_speed_lavel);
+                m_last_velocity_update = ros::Time::now();
+            }
             else if (((int)m_joy.btn.components.F1 == 1))
             {
+                m_cmd_speed_level = 0;
                 m_cmd_max_velocity = 0.0f;
-                ROS_INFO_STREAM("Reset max velocity to 0.0: " << m_cmd_max_velocity);
+                ROS_INFO_STREAM("Reset max velocity and speed level to: " << m_cmd_max_velocity << " and " << m_cmd_speed_level);
                 m_last_velocity_update = ros::Time::now();
             }
             else if (((int)m_joy.btn.components.select == 1))
