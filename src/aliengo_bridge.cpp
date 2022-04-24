@@ -19,8 +19,8 @@ namespace aliengo_bridge
         m_last_cmd_time = ros::Time::now();
         m_last_velocity_update = ros::Time::now();
 
-        // ROS
-        m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
+        // Publishers
+        m_cmd_pub = ph.advertise< unitree_legged_msgs::HighCmd >( "high_cmd", 1 );
         m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "high_state", 1 );
         
         // SDK
@@ -30,38 +30,6 @@ namespace aliengo_bridge
         m_loop_udpSend.start();
         m_loop_udpRecv.start();
         m_loop_control.start();
-    }
-
-    void AlienGoBridge::cmdCallback( const unitree_legged_msgs::HighCmd& cmd )
-    {
-        boost::mutex::scoped_lock lock(m_cmd_mutex);
-        m_cmd.mode = cmd.mode;  // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
-                                // 2.target velocity walking (controlled by velocity + yawSpeed)
-                                // 3.target position walking (controlled by position + rpy[2])
-                                // 4. path mode walking (reserve for future release)
-                                // 5. position stand down. |6. position stand up |7. damping mode | 8. recovery mode
-        
-        m_cmd.gaitType = cmd.gaitType; // 0.trot | 1. trot running  | 2.climb stair
-
-        m_cmd.speedLevel = cmd.speedLevel; // 0. default low speed. 1. medium speed 2. high speed. during walking
-        
-        m_cmd.dFootRaiseHeight = cmd.dFootRaiseHeight; // (unit: m), swing foot height adjustment from default swing height.
-
-        m_cmd.dBodyHeight = cmd.dBodyHeight; // (unit: m), body height adjustment from default body height.
-
-        m_cmd.position[0] = cmd.position[0]; // (unit: m), desired x in inertial frame.
-        m_cmd.position[1] = cmd.position[1]; // (unit: m), y position in inertial frame.
-
-        m_cmd.rpy[0] = cmd.rpy[0]; // (unit: rad), desired roll euler angle
-        m_cmd.rpy[1] = cmd.rpy[1]; // (unit: rad), desired pitch euler angle
-        m_cmd.rpy[2] = cmd.rpy[2]; // (unit: rad), desired yaw euler angle
-
-        m_cmd.velocity[0] = cmd.velocity[0]; // (unit: m/s), forwardSpeed in body frame.
-        m_cmd.velocity[1] = cmd.velocity[1]; // (unit: m/s), sideSpeed in body frame.
-        m_cmd.yawSpeed = cmd.yawSpeed;    // (unit: rad/s), rotateSpeed in body frame.
-
-        m_received_cmd = true;
-        m_last_cmd_time = ros::Time::now();
     }
 
     void AlienGoBridge::UDPRecv()
@@ -120,7 +88,7 @@ namespace aliengo_bridge
 
         m_cmd.speedLevel = m_cmd_speed_level; // 0. default low speed. 1. medium speed 2. high speed. during walking
         
-        m_cmd.dFootRaiseHeight = 0.06f; // (unit: m), swing foot height adjustment from default swing height.
+        m_cmd.dFootRaiseHeight = 0.08f; // (unit: m), swing foot height adjustment from default swing height.
 
         m_cmd.dBodyHeight = 0.0f; // (unit: m), body height adjustment from default body height.
 
@@ -156,8 +124,28 @@ namespace aliengo_bridge
         m_udp.SetSend(m_cmd);
         m_cmd_mutex.unlock();
         
+        publishCmd();
         publishState();
         joystickUpdate();
+    }
+
+    void AlienGoBridge::publishCmd()
+    {
+        boost::mutex::scoped_lock lock(m_cmd_mutex);
+        
+        unitree_legged_msgs::HighCmd msg;
+
+        msg.mode = m_cmd.mode;
+        msg.gaitType = m_cmd.gaitType;
+        msg.speedLevel = m_cmd.speedLevel;
+        msg.dFootRaiseHeight = m_cmd.dFootRaiseHeight;
+        msg.dBodyHeight = m_cmd.dBodyHeight;
+        msg.position = m_cmd.position;
+        msg.rpy = m_cmd.rpy;
+        msg.velocity = m_cmd.velocity;
+        msg.yawSpeed = m_cmd.yawSpeed;
+        
+        m_cmd_pub.publish( msg );
     }
 
     void AlienGoBridge::publishState()
@@ -234,7 +222,7 @@ namespace aliengo_bridge
         memcpy(&m_joy, m_state.wirelessRemote, 40);
 
         // Update velocities every second otherwise values increase too quick
-        if ((ros::Time::now() - m_last_velocity_update).toSec() > 1.)
+        if ((ros::Time::now() - m_last_velocity_update).toSec() > 0.5)
         {
             if (((int)m_joy.btn.components.up == 1) && m_cmd_max_velocity < 1.0) 
             {
