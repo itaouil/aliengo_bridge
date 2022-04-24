@@ -260,7 +260,7 @@ namespace aliengo_bridge
                 ROS_INFO_STREAM("Decreased speed level by 1 to: " << (int)m_cmd_speed_level);
                 m_last_velocity_update = ros::Time::now();
             }
-            else if (((int)m_joy.btn.components.F1 == 1))
+            else if (((int)m_joy.btn.components.L1 == 1))
             {
                 m_cmd_speed_level = 0;
                 m_cmd_max_velocity = 0.0f;
