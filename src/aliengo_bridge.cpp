@@ -250,14 +250,14 @@ namespace aliengo_bridge
             }
             else if (((int)m_joy.btn.components.Y == 1) && m_cmd_speed_level < 2)
             {
-                m_cmd_speed_lavel += 1;
-                ROS_INFO_STREAM("Increased speed level by 1 to: " << m_cmd_speed_lavel);
+                m_cmd_speed_level += 1;
+                ROS_INFO_STREAM("Increased speed level by 1 to: " << m_cmd_speed_level);
                 m_last_velocity_update = ros::Time::now();
             }
             else if (((int)m_joy.btn.components.A == 1) && m_cmd_speed_level > 0)
             {
-                m_cmd_speed_lavel -= 1;
-                ROS_INFO_STREAM("Decreased speed level by 1 to: " << m_cmd_speed_lavel);
+                m_cmd_speed_level -= 1;
+                ROS_INFO_STREAM("Decreased speed level by 1 to: " << m_cmd_speed_level);
                 m_last_velocity_update = ros::Time::now();
             }
             else if (((int)m_joy.btn.components.F1 == 1))
