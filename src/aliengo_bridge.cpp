@@ -140,9 +140,13 @@ namespace aliengo_bridge
         msg.speedLevel = m_cmd.speedLevel;
         msg.dFootRaiseHeight = m_cmd.dFootRaiseHeight;
         msg.dBodyHeight = m_cmd.dBodyHeight;
-        msg.position = m_cmd.position;
-        msg.rpy = m_cmd.rpy;
-        msg.velocity = m_cmd.velocity;
+        msg.position[0] = m_cmd.position[0];
+        msg.position[1] = m_cmd.position[1];
+        msg.rpy[0] = m_cmd.rpy[0];
+        msg.rpy[1] = m_cmd.rpy[1];
+        msg.rpy[2] = m_cmd.rpy[2];
+        msg.velocity[0] = m_cmd.velocity[0];
+        msg.velocity[1] = m_cmd.velocity[1];
         msg.yawSpeed = m_cmd.yawSpeed;
         
         m_cmd_pub.publish( msg );
