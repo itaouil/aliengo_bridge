@@ -13,33 +13,17 @@ namespace aliengo_bridge
     , m_loop_udpRecv("udp_recv", m_dt, 3, boost::bind(&AlienGoBridge::UDPRecv, this))
     {
         // ROS
-        m_joy_sub = ph.subscribe( "joy", 1, &AlienGoBridge::joyCallback, this );
         m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
+        m_joints_pub = ph.advertise< sensor_msgs::JointState >( "joint_states", 1 );
         m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "high_state", 1 );
         
         // SDK
         m_udp.InitCmdData(m_cmd);
-        m_motion_timestep = static_cast<int>( 1000 * m_dt );
         
         m_loop_udpSend.start();
         m_loop_udpRecv.start();
         m_loop_control.start();
     }
-
-    void AlienGoBridge::joyCallback(const sensor_msgs::Joy::ConstPtr& msg) {
-        boost::mutex::scoped_lock lock(m_cmd_mutex);
-        m_last_cmd_time = msg->header.stamp;
-
-        if (msg->buttons[0] && m_cmd_max_velocity < 1.0)
-            m_cmd_max_velocity += 0.1;
-        else if (msg->buttons[1] && m_cmd_max_velocity > 0.1)
-            m_cmd_max_velocity -= 0.1;
-        
-        ROS_INFO_STREAM("Publishing max velocity: " << m_cmd_max_velocity);
-
-        m_received_cmd = true;
-    }
-
 
     void AlienGoBridge::cmdCallback( const unitree_legged_msgs::HighCmd& cmd )
     {
@@ -87,7 +71,7 @@ namespace aliengo_bridge
 
     void AlienGoBridge::resetCmd()
     {
-        m_cmd.mode = 0;           // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
+        m_cmd.mode = 0;         // 0.idle, default stand | 1.force stand (controlled by dBodyHeight + rpy)
                                 // 2.target velocity walking (controlled by velocity + yawSpeed)
                                 // 3.target position walking (controlled by position + rpy[2])
                                 // 4. path mode walking (reserve for future release)
@@ -135,72 +119,71 @@ namespace aliengo_bridge
         m_udp.SetSend(m_cmd);
         m_cmd_mutex.unlock();
         
-        publishState();
+        publishStates();
     }
 
-    void AlienGoBridge::publishState()
+    void AlienGoBridge::publishStates()
     {
         boost::mutex::scoped_lock lock(m_state_mutex);
         
-        sensor_msgs::Imu l_imuMsg;
-        unitree_legged_msgs::HighState msg;
-        sensor_msgs::JointState l_jointStateMsg;
+        sensor_msgs::JointState joint_state;
+        unitree_legged_msgs::HighState hight_state;
         
-        msg.levelFlag = m_state.levelFlag;
-        msg.commVersion = m_state.commVersion;
-        msg.robotID = m_state.robotID;
-        msg.SN = m_state.SN;
-        msg.bandWidth = m_state.bandWidth;
-        msg.mode = m_state.mode;
+        hight_state.levelFlag = m_state.levelFlag;
+        hight_state.commVersion = m_state.commVersion;
+        hight_state.robotID = m_state.robotID;
+        hight_state.SN = m_state.SN;
+        hight_state.bandWidth = m_state.bandWidth;
+        hight_state.mode = m_state.mode;
         
-        msg.imu.quaternion[0] = m_state.imu.quaternion[0];
-        msg.imu.quaternion[1] = m_state.imu.quaternion[1];
-        msg.imu.quaternion[2] = m_state.imu.quaternion[2];
-        msg.imu.quaternion[3] = m_state.imu.quaternion[3];
-        msg.imu.gyroscope[0] = m_state.imu.gyroscope[0];
-        msg.imu.gyroscope[1] = m_state.imu.gyroscope[1];
-        msg.imu.gyroscope[2] = m_state.imu.gyroscope[2];
-        msg.imu.accelerometer[0] = m_state.imu.accelerometer[0];
-        msg.imu.accelerometer[1] = m_state.imu.accelerometer[1];
-        msg.imu.accelerometer[2] = m_state.imu.accelerometer[2];
-        msg.imu.rpy[0] = m_state.imu.rpy[0];
-        msg.imu.rpy[1] = m_state.imu.rpy[1];
-        msg.imu.rpy[2] = m_state.imu.rpy[2];
-        msg.imu.temperature = m_state.imu.temperature;
+        hight_state.imu.quaternion[0] = m_state.imu.quaternion[0];
+        hight_state.imu.quaternion[1] = m_state.imu.quaternion[1];
+        hight_state.imu.quaternion[2] = m_state.imu.quaternion[2];
+        hight_state.imu.quaternion[3] = m_state.imu.quaternion[3];
+        hight_state.imu.gyroscope[0] = m_state.imu.gyroscope[0];
+        hight_state.imu.gyroscope[1] = m_state.imu.gyroscope[1];
+        hight_state.imu.gyroscope[2] = m_state.imu.gyroscope[2];
+        hight_state.imu.accelerometer[0] = m_state.imu.accelerometer[0];
+        hight_state.imu.accelerometer[1] = m_state.imu.accelerometer[1];
+        hight_state.imu.accelerometer[2] = m_state.imu.accelerometer[2];
+        hight_state.imu.rpy[0] = m_state.imu.rpy[0];
+        hight_state.imu.rpy[1] = m_state.imu.rpy[1];
+        hight_state.imu.rpy[2] = m_state.imu.rpy[2];
+        hight_state.imu.temperature = m_state.imu.temperature;
         
-        msg.gaitType = m_state.gaitType;
-        msg.footRaiseHeight = m_state.footRaiseHeight;
-        msg.bodyHeight = m_state.bodyHeight;
+        hight_state.gaitType = m_state.gaitType;
+        hight_state.footRaiseHeight = m_state.footRaiseHeight;
+        hight_state.bodyHeight = m_state.bodyHeight;
 
-        msg.position[0] = m_state.position[0];
-        msg.position[1] = m_state.position[1];
-        msg.position[2] = m_state.position[2];
+        hight_state.position[0] = m_state.position[0];
+        hight_state.position[1] = m_state.position[1];
+        hight_state.position[2] = m_state.position[2];
         
-        msg.velocity[0] = m_state.velocity[0];
-        msg.velocity[1] = m_state.velocity[1];
-        msg.velocity[2] = m_state.velocity[2];
+        hight_state.velocity[0] = m_state.velocity[0];
+        hight_state.velocity[1] = m_state.velocity[1];
+        hight_state.velocity[2] = m_state.velocity[2];
         
-        msg.yawSpeed = m_state.yawSpeed;
+        hight_state.yawSpeed = m_state.yawSpeed;
         
         for ( int i = 0; i < 4; ++i )
         {
-            msg.footPosition2Body[i].x = m_state.footPosition2Body[i].x;
-            msg.footPosition2Body[i].y = m_state.footPosition2Body[i].y;
-            msg.footPosition2Body[i].z = m_state.footPosition2Body[i].z;
+            hight_state.footPosition2Body[i].x = m_state.footPosition2Body[i].x;
+            hight_state.footPosition2Body[i].y = m_state.footPosition2Body[i].y;
+            hight_state.footPosition2Body[i].z = m_state.footPosition2Body[i].z;
             
-            msg.footSpeed2Body[i].x = m_state.footSpeed2Body[i].x;
-            msg.footSpeed2Body[i].y = m_state.footSpeed2Body[i].y;
-            msg.footSpeed2Body[i].z = m_state.footSpeed2Body[i].z;
+            hight_state.footSpeed2Body[i].x = m_state.footSpeed2Body[i].x;
+            hight_state.footSpeed2Body[i].y = m_state.footSpeed2Body[i].y;
+            hight_state.footSpeed2Body[i].z = m_state.footSpeed2Body[i].z;
             
-            msg.footForce[i] = m_state.footForce[i];
+            hight_state.footForce[i] = m_state.footForce[i];
         }
         
         for ( int i = 0; i < 40; ++i )
-            msg.wirelessRemote[i] = m_state.wirelessRemote[i];
+            hight_state.wirelessRemote[i] = m_state.wirelessRemote[i];
 
-        msg.reserve = m_state.reserve;
-        msg.crc = m_state.crc;
+        hight_state.reserve = m_state.reserve;
+        hight_state.crc = m_state.crc;
         
-        m_state_pub.publish( msg );
+        m_state_pub.publish( hight_state );
     }
 }

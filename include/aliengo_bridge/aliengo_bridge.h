@@ -34,7 +34,7 @@ private:
     void UDPSend();
     void control();
     void resetCmd();
-    void publishState();
+    void publishStates();
     void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
 
@@ -44,23 +44,17 @@ private:
     Safety m_safe;
     HighCmd m_cmd = {0};
     HighState m_state = {0};
-    xRockerBtnDataStruct _keyData;
+    HighState m_state = {0};
 
     float m_dt = 0.002;
-    int m_motiontime = 0;
-    int m_motion_timestep;
 
-    ros::Time m_last_joy_time;
-    float m_cmd_min_velocity = 0.0;
-    float m_cmd_max_velocity = 0.1;
-    
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;
     LoopFunc m_loop_udpRecv;
     
     ros::Subscriber m_cmd_sub;
-    ros::Subscriber m_joy_sub;
     ros::Publisher m_state_pub;
+    ros::Publisher m_joints_pub;
     
     ros::Time m_last_cmd_time;
     float m_cmd_timeout = 1.;
