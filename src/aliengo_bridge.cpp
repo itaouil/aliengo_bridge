@@ -128,6 +128,10 @@ namespace aliengo_bridge
         
         sensor_msgs::JointState joint_state;
         unitree_legged_msgs::HighState hight_state;
+
+        joint_state.header.stamp = ros::Time::now();
+        joint_state.name.resize(12);
+        joint_state.position.resize(12);
         
         hight_state.levelFlag = m_state.levelFlag;
         hight_state.commVersion = m_state.commVersion;
