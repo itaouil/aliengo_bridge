@@ -22,10 +22,10 @@ namespace aliengo_bridge
         m_jointStateMsg.position.resize(12);
         m_jointStateMsg.velocity.resize(12);
         m_jointStateMsg.effort.resize(12);
-        m_jointStateMsg.name = {"FR_0", "FR_1", "FR_2",
-                                "FL_0", "FL_1", "FL_2",
-                                "RR_0", "RR_1", "RR_2",
-                                "RL_0", "RL_1", "RL_2"};
+        m_jointStateMsg.name = {"FR_hip", "FR_thigh", "FR_calf",
+                                "FL_hip", "FL_thigh", "FL_calf",
+                                "RR_hip", "RR_thigh", "RR_calf",
+                                "RL_hip", "RL_thigh", "RL_calf"};
         
         // SDK
         m_udp.InitCmdData(m_cmd);
