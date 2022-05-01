@@ -22,10 +22,10 @@ namespace aliengo_bridge
         m_jointStateMsg.position.resize(12);
         m_jointStateMsg.velocity.resize(12);
         m_jointStateMsg.effort.resize(12);
-        m_jointStateMsg.name = {"FR_hip", "FR_thigh", "FR_calf",
-                                "FL_hip", "FL_thigh", "FL_calf",
-                                "RR_hip", "RR_thigh", "RR_calf",
-                                "RL_hip", "RL_thigh", "RL_calf"};
+        m_jointStateMsg.name = {"FR_hip_joint", "FR_thigh_joint", "FR_calf_joint",
+                                "FL_hip_joint", "FL_thigh_joint", "FL_calf_joint",
+                                "RR_hip_joint", "RR_thigh_joint", "RR_calf_joint",
+                                "RL_hip_joint", "RL_thigh_joint", "RL_calf_joint"};
         
         // SDK
         m_udp.InitCmdData(m_cmd);
