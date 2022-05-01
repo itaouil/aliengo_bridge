@@ -16,6 +16,14 @@ namespace aliengo_bridge
         m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
         m_joints_pub = ph.advertise< sensor_msgs::JointState >( "joint_states", 1 );
         m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "high_state", 1 );
+
+        // Init joint state msg size
+        m_jointStateMsg.name.resize(12);
+        m_jointStateMsg.position.resize(12);
+        m_jointStateMsg.name = {"FR_0", "FR_1", "FR_2",
+                                "FL_0", "FL_1", "FL_2",
+                                "RR_0", "RR_1", "RR_2",
+                                "RL_0", "RL_1", "RL_2"}
         
         // SDK
         m_udp.InitCmdData(m_cmd);
@@ -119,82 +127,89 @@ namespace aliengo_bridge
         m_udp.SetSend(m_cmd);
         m_cmd_mutex.unlock();
         
-        publishStates();
+        publishHighState();
+        publishJointState();
     }
 
-    void AlienGoBridge::publishStates()
+    void AlienGoBridge::publishJointState()
     {
         boost::mutex::scoped_lock lock(m_state_mutex);
         
-        sensor_msgs::JointState joint_state;
-        unitree_legged_msgs::HighState hight_state;
+        m_jointStateMsg.header.stamp = ros::Time::now();
+        for ( int i = 0; i < 12; ++i )
+        {
+            m_jointStateMsg.position[i] = m_state.motorState[i].q;
+        }
 
-        joint_state.header.stamp = ros::Time::now();
-        joint_state.name.resize(12);
-        joint_state.position.resize(12);
+        m_joints_pub.publish(m_jointStateMsg);
+    }
+
+    void AlienGoBridge::publishHighState()
+    {
+        boost::mutex::scoped_lock lock(m_state_mutex);
         
-        hight_state.levelFlag = m_state.levelFlag;
-        hight_state.commVersion = m_state.commVersion;
-        hight_state.robotID = m_state.robotID;
-        hight_state.SN = m_state.SN;
-        hight_state.bandWidth = m_state.bandWidth;
-        hight_state.mode = m_state.mode;
+        m_stateMsg.levelFlag = m_state.levelFlag;
+        m_stateMsg.commVersion = m_state.commVersion;
+        m_stateMsg.robotID = m_state.robotID;
+        m_stateMsg.SN = m_state.SN;
+        m_stateMsg.bandWidth = m_state.bandWidth;
+        m_stateMsg.mode = m_state.mode;
         
-        hight_state.imu.quaternion[0] = m_state.imu.quaternion[0];
-        hight_state.imu.quaternion[1] = m_state.imu.quaternion[1];
-        hight_state.imu.quaternion[2] = m_state.imu.quaternion[2];
-        hight_state.imu.quaternion[3] = m_state.imu.quaternion[3];
-        hight_state.imu.gyroscope[0] = m_state.imu.gyroscope[0];
-        hight_state.imu.gyroscope[1] = m_state.imu.gyroscope[1];
-        hight_state.imu.gyroscope[2] = m_state.imu.gyroscope[2];
-        hight_state.imu.accelerometer[0] = m_state.imu.accelerometer[0];
-        hight_state.imu.accelerometer[1] = m_state.imu.accelerometer[1];
-        hight_state.imu.accelerometer[2] = m_state.imu.accelerometer[2];
-        hight_state.imu.rpy[0] = m_state.imu.rpy[0];
-        hight_state.imu.rpy[1] = m_state.imu.rpy[1];
-        hight_state.imu.rpy[2] = m_state.imu.rpy[2];
-        hight_state.imu.temperature = m_state.imu.temperature;
+        m_stateMsg.imu.quaternion[0] = m_state.imu.quaternion[0];
+        m_stateMsg.imu.quaternion[1] = m_state.imu.quaternion[1];
+        m_stateMsg.imu.quaternion[2] = m_state.imu.quaternion[2];
+        m_stateMsg.imu.quaternion[3] = m_state.imu.quaternion[3];
+        m_stateMsg.imu.gyroscope[0] = m_state.imu.gyroscope[0];
+        m_stateMsg.imu.gyroscope[1] = m_state.imu.gyroscope[1];
+        m_stateMsg.imu.gyroscope[2] = m_state.imu.gyroscope[2];
+        m_stateMsg.imu.accelerometer[0] = m_state.imu.accelerometer[0];
+        m_stateMsg.imu.accelerometer[1] = m_state.imu.accelerometer[1];
+        m_stateMsg.imu.accelerometer[2] = m_state.imu.accelerometer[2];
+        m_stateMsg.imu.rpy[0] = m_state.imu.rpy[0];
+        m_stateMsg.imu.rpy[1] = m_state.imu.rpy[1];
+        m_stateMsg.imu.rpy[2] = m_state.imu.rpy[2];
+        m_stateMsg.imu.temperature = m_state.imu.temperature;
 
         for ( int i = 0; i < 20; ++i )
         {
-            hight_state.motorState[i].q = m_state.motorState[i].q;
-            hight_state.motorState[i].dq = m_state.motorState[i].dq;
-            hight_state.motorState[i].tauEst = m_state.motorState[i].tauEst;
+            m_stateMsg.motorState[i].q = m_state.motorState[i].q;
+            m_stateMsg.motorState[i].dq = m_state.motorState[i].dq;
+            m_stateMsg.motorState[i].tauEst = m_state.motorState[i].tauEst;
         }
         
-        hight_state.gaitType = m_state.gaitType;
-        hight_state.footRaiseHeight = m_state.footRaiseHeight;
-        hight_state.bodyHeight = m_state.bodyHeight;
+        m_stateMsg.gaitType = m_state.gaitType;
+        m_stateMsg.footRaiseHeight = m_state.footRaiseHeight;
+        m_stateMsg.bodyHeight = m_state.bodyHeight;
 
-        hight_state.position[0] = m_state.position[0];
-        hight_state.position[1] = m_state.position[1];
-        hight_state.position[2] = m_state.position[2];
+        m_stateMsg.position[0] = m_state.position[0];
+        m_stateMsg.position[1] = m_state.position[1];
+        m_stateMsg.position[2] = m_state.position[2];
         
-        hight_state.velocity[0] = m_state.velocity[0];
-        hight_state.velocity[1] = m_state.velocity[1];
-        hight_state.velocity[2] = m_state.velocity[2];
+        m_stateMsg.velocity[0] = m_state.velocity[0];
+        m_stateMsg.velocity[1] = m_state.velocity[1];
+        m_stateMsg.velocity[2] = m_state.velocity[2];
         
-        hight_state.yawSpeed = m_state.yawSpeed;
+        m_stateMsg.yawSpeed = m_state.yawSpeed;
         
         for ( int i = 0; i < 4; ++i )
         {
-            hight_state.footPosition2Body[i].x = m_state.footPosition2Body[i].x;
-            hight_state.footPosition2Body[i].y = m_state.footPosition2Body[i].y;
-            hight_state.footPosition2Body[i].z = m_state.footPosition2Body[i].z;
+            m_stateMsg.footPosition2Body[i].x = m_state.footPosition2Body[i].x;
+            m_stateMsg.footPosition2Body[i].y = m_state.footPosition2Body[i].y;
+            m_stateMsg.footPosition2Body[i].z = m_state.footPosition2Body[i].z;
             
-            hight_state.footSpeed2Body[i].x = m_state.footSpeed2Body[i].x;
-            hight_state.footSpeed2Body[i].y = m_state.footSpeed2Body[i].y;
-            hight_state.footSpeed2Body[i].z = m_state.footSpeed2Body[i].z;
+            m_stateMsg.footSpeed2Body[i].x = m_state.footSpeed2Body[i].x;
+            m_stateMsg.footSpeed2Body[i].y = m_state.footSpeed2Body[i].y;
+            m_stateMsg.footSpeed2Body[i].z = m_state.footSpeed2Body[i].z;
             
-            hight_state.footForce[i] = m_state.footForce[i];
+            m_stateMsg.footForce[i] = m_state.footForce[i];
         }
         
         for ( int i = 0; i < 40; ++i )
-            hight_state.wirelessRemote[i] = m_state.wirelessRemote[i];
+            m_stateMsg.wirelessRemote[i] = m_state.wirelessRemote[i];
 
-        hight_state.reserve = m_state.reserve;
-        hight_state.crc = m_state.crc;
+        m_stateMsg.reserve = m_state.reserve;
+        m_stateMsg.crc = m_state.crc;
         
-        m_state_pub.publish( hight_state );
+        m_state_pub.publish( m_stateMsg );
     }
 }

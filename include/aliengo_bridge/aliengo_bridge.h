@@ -34,7 +34,8 @@ private:
     void UDPSend();
     void control();
     void resetCmd();
-    void publishStates();
+    void publishHighState();
+    void publishJointState():
     void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
 
@@ -46,6 +47,9 @@ private:
     HighState m_state = {0};
 
     float m_dt = 0.001;
+
+    sensor_msgs::JointState m_jointStateMsg;
+    unitree_legged_msgs::HighState m_stateMsg;
 
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;
