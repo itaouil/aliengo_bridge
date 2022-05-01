@@ -20,7 +20,7 @@ namespace aliengo_bridge
         // Init joint state msg size
         m_jointStateMsg.name.resize(12);
         m_jointStateMsg.position.resize(12);
-        m_jointStateMsg.veloctiy.resize(12);
+        m_jointStateMsg.velocity.resize(12);
         m_jointStateMsg.effort.resize(12);
         m_jointStateMsg.name = {"FR_0", "FR_1", "FR_2",
                                 "FL_0", "FL_1", "FL_2",
