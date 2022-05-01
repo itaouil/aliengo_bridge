@@ -20,6 +20,8 @@ namespace aliengo_bridge
         // Init joint state msg size
         m_jointStateMsg.name.resize(12);
         m_jointStateMsg.position.resize(12);
+        m_jointStateMsg.veloctiy.resize(12);
+        m_jointStateMsg.effort.resize(12);
         m_jointStateMsg.name = {"FR_0", "FR_1", "FR_2",
                                 "FL_0", "FL_1", "FL_2",
                                 "RR_0", "RR_1", "RR_2",
@@ -64,8 +66,6 @@ namespace aliengo_bridge
         m_received_cmd = true;
         m_last_cmd_time = ros::Time::now();
     }
-
-
 
     void AlienGoBridge::UDPRecv()
     {
@@ -139,6 +139,8 @@ namespace aliengo_bridge
         for ( int i = 0; i < 12; ++i )
         {
             m_jointStateMsg.position[i] = m_state.motorState[i].q;
+            m_jointStateMsg.velocity[i] = m_state.motorState[i].dq;
+            m_jointStateMsg.effort[i] = m_state.motorState[i].tauEst;
         }
 
         m_joints_pub.publish(m_jointStateMsg);
