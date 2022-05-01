@@ -157,7 +157,7 @@ namespace aliengo_bridge
 
         for ( int i = 0; i < 20; ++i )
         {
-            hight_state.motorState[i].q = m_state.motorState[i].d;
+            hight_state.motorState[i].q = m_state.motorState[i].q;
             hight_state.motorState[i].dq = m_state.motorState[i].dq;
             hight_state.motorState[i].tauEst = m_state.motorState[i].tauEst;
         }
