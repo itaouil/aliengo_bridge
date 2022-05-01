@@ -35,7 +35,7 @@ private:
     void control();
     void resetCmd();
     void publishHighState();
-    void publishJointState():
+    void publishJointState();
     void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
 

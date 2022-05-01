@@ -23,7 +23,7 @@ namespace aliengo_bridge
         m_jointStateMsg.name = {"FR_0", "FR_1", "FR_2",
                                 "FL_0", "FL_1", "FL_2",
                                 "RR_0", "RR_1", "RR_2",
-                                "RL_0", "RL_1", "RL_2"}
+                                "RL_0", "RL_1", "RL_2"};
         
         // SDK
         m_udp.InitCmdData(m_cmd);
