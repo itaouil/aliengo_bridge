@@ -154,6 +154,13 @@ namespace aliengo_bridge
         hight_state.imu.rpy[1] = m_state.imu.rpy[1];
         hight_state.imu.rpy[2] = m_state.imu.rpy[2];
         hight_state.imu.temperature = m_state.imu.temperature;
+
+        for ( int i = 0; i < 20; ++i )
+        {
+            hight_state.motorState[i].q = m_state.motorState[i].d;
+            hight_state.motorState[i].dq = m_state.motorState[i].dq;
+            hight_state.motorState[i].tauEst = m_state.motorState[i].tauEst;
+        }
         
         hight_state.gaitType = m_state.gaitType;
         hight_state.footRaiseHeight = m_state.footRaiseHeight;

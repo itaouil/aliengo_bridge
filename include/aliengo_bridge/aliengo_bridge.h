@@ -45,7 +45,7 @@ private:
     HighCmd m_cmd = {0};
     HighState m_state = {0};
 
-    float m_dt = 0.002;
+    float m_dt = 0.001;
 
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;
@@ -65,4 +65,3 @@ private:
 
 }
 #endif
-
