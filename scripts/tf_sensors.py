@@ -10,16 +10,18 @@ from nav_msgs.msg import Odometry
 def odom_callback(msg):
     br = tf.TransformBroadcaster()
 
-    # Create 4x4 numpy optical to world transformation
-    optical_to_world_numpy_rot = tf.transformations.quaternion_matrix([0, -0.1218693, 0, 0.9925462])
-    optical_to_world_numpy_trans = tf.transformations.translation_matrix([-0.3, 0, 0])
+    # T265 rot and translation
+    t265_world_rot = tf.transformations.quaternion_matrix([0, 0, 0, 0])
+    t265_world_trans = tf.transformations.translation_matrix([msg.pose.pose.position.x,
+                                                              msg.pose.pose.position.y,
+                                                              msg.pose.pose.position.z])
 
-    # Publish transform
-    br.sendTransform(tf.transformations.translation_from_matrix(optical_to_world_numpy_trans),
-                     tf.transformations.quaternion_from_matrix(optical_to_world_numpy_rot),
+    # Publish static transform for t265 pose
+    br.sendTransform(tf.transformations.translation_from_matrix(t265_world_trans),
+                     tf.transformations.quaternion_from_matrix(t265_world_rot),
                      rospy.Time.now(),
-                     "base",
-                     "t265_pose_frame")
+                     "t265_pose_frame",
+                     "t265_link")
 
 def main():
     # Create ROS node
