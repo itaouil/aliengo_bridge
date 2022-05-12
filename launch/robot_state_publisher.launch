@@ -2,6 +2,9 @@
    <!-- Load the urdf into the parameter server. -->
    <param name="aliengo_description" textfile="$(find aliengo_description)/urdf/aliengo.urdf"/>
 
+   <!-- Load the semantic description into the parameter server -->
+   <param name="aliengo_description_semantic" textfile="$(find aliengo_description)/urdf/aliengo.srdf"/>
+
    <!-- Launch robot state publisher -->
    <node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub">
     <remap from="robot_description" to="aliengo_description"/>
