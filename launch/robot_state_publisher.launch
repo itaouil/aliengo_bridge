@@ -1,6 +1,8 @@
 <launch>
+   <!-- <param name="aliengo_description" textfile="$(find aliengo_description)/urdf/aliengo.urdf"/> -->
+
    <!-- Load the urdf into the parameter server. -->
-   <param name="aliengo_description" textfile="$(find aliengo_description)/urdf/aliengo.urdf"/>
+   <param name="aliengo_description" command="$(find xacro)/xacro --inorder '$(find aliengo_description)/xacro/robot.xacro'"/>
 
    <!-- Load the semantic description into the parameter server -->
    <param name="aliengo_description_semantic" textfile="$(find aliengo_description)/urdf/aliengo.srdf"/>
