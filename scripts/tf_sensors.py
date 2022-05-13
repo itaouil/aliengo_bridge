@@ -14,12 +14,23 @@ def odom_callback(msg):
     t265_world_rot = tf.transformations.quaternion_matrix([0, -0.1218693, 0, 0.9925462])
     t265_world_trans = tf.transformations.translation_matrix([-0.33118, 0, -0.0045])
 
+    # D435 rot and translation
+    d435_world_rot = tf.transformations.quaternion_matrix([0, -0.1218693, 0, 0.9925462])
+    d435_world_trans = tf.transformations.translation_matrix([-0.33118, 0, -0.03462])
+
     # Publish static transform for t265 pose
     br.sendTransform(tf.transformations.translation_from_matrix(t265_world_trans),
                      tf.transformations.quaternion_from_matrix(t265_world_rot),
                      rospy.Time.now(),
                      "base",
                      "t265_link")
+
+    # Publish static transform for d435 pose
+    br.sendTransform(tf.transformations.translation_from_matrix(d435_world_trans),
+                     tf.transformations.quaternion_from_matrix(d435_world_rot),
+                     rospy.Time.now(),
+                     "base",
+                     "d435_link")
 
 def main():
     # Create ROS node
