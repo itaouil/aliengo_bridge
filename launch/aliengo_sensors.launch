@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+  <!-- Start robot state publisher -->
+  <include file="$(find aliengo_bridge)/launch/robot_state_publisher.launch"/>
+
+  <!-- Add sensors to tf tree -->
+  <node pkg="aliengo_bridge" type="tf_sensors" name="tf_sensors">
+</launch>
