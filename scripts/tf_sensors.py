@@ -19,7 +19,7 @@ def odom_callback(msg):
                      tf.transformations.quaternion_from_matrix(t265_world_rot),
                      rospy.Time.now(),
                      "base",
-                     "t265_pose_frame")
+                     "t265_link")
 
 def main():
     # Create ROS node
