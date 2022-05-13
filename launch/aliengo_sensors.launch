@@ -5,5 +5,5 @@
   <include file="$(find aliengo_bridge)/launch/robot_state_publisher.launch"/>
 
   <!-- Add sensors to tf tree -->
-  <node pkg="aliengo_bridge" type="tf_sensors" name="tf_sensors">
+  <node pkg="aliengo_bridge" type="tf_sensors.py" name="tf_sensors"></node>
 </launch>
