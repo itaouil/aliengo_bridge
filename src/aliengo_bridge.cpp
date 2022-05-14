@@ -15,7 +15,7 @@ namespace aliengo_bridge
         // ROS
         m_cmd_sub = ph.subscribe( "cmd", 1, &AlienGoBridge::cmdCallback, this );
         m_joints_pub = ph.advertise< sensor_msgs::JointState >( "joint_states", 1 );
-        m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "high_state", 1 );
+        m_state_pub = ph.advertise< unitree_legged_msgs::HighStateStamped >( "high_state", 1 );
 
         // Init joint state msg size
         m_jointStateMsg.name.resize(12);
@@ -149,6 +149,8 @@ namespace aliengo_bridge
     void AlienGoBridge::publishHighState()
     {
         boost::mutex::scoped_lock lock(m_state_mutex);
+
+        m_stateMsg.header.stamp = ros::Time::now();
         
         m_stateMsg.levelFlag = m_state.levelFlag;
         m_stateMsg.commVersion = m_state.commVersion;
@@ -212,6 +214,6 @@ namespace aliengo_bridge
         m_stateMsg.reserve = m_state.reserve;
         m_stateMsg.crc = m_state.crc;
         
-        m_state_pub.publish( m_stateMsg );
+        m_state_pub.publish(m_stateMsg);
     }
 }

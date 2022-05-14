@@ -16,7 +16,7 @@
 
 // Unitree
 #include <unitree_legged_msgs/HighCmd.h>
-#include <unitree_legged_msgs/HighState.h>
+#include <unitree_legged_msgs/HighStateStamped.h>
 #include "unitree_legged_sdk/unitree_joystick.h"
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 
@@ -49,7 +49,7 @@ private:
     float m_dt = 0.001;
 
     sensor_msgs::JointState m_jointStateMsg;
-    unitree_legged_msgs::HighState m_stateMsg;
+    unitree_legged_msgs::HighStateStamped m_stateMsg;
 
     LoopFunc m_loop_control;
     LoopFunc m_loop_udpSend;
