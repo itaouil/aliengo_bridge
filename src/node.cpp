@@ -4,7 +4,7 @@
 int main( int argc, char** argv )
 {
     ros::init( argc, argv, "aliengo_bridge" );
-    std::cout << "Starting AlienGo bridge. Communication level is set to HIGH-level." << std::endl
+    std::cout << "Starting AlienGo bridge. Communication level is set to HIGH-level." << std::endl;
     
     ros::NodeHandle ph( "~" );
     aliengo_bridge::AlienGoBridge bridge( ph );
