@@ -15,6 +15,8 @@
 #include <sensor_msgs/JointState.h>
 
 // Unitree
+#include <unitree_legged_msgs/HighCmd.h>
+#include <unitree_legged_msgs/HighState.h>
 #include <unitree_legged_msgs/HighCmdStamped.h>
 #include <unitree_legged_msgs/HighStateStamped.h>
 #include "unitree_legged_sdk/unitree_joystick.h"
@@ -45,9 +47,8 @@ private:
     
     UDP m_udp;
     Safety m_safe;
-    HighCmd m_cmdUDP;
-    HighCmdStamped m_cmd;
-    HighStateStamped m_state;
+    HighCmd m_cmd;
+    HighState m_state;
 
     float m_dt = 0.002;
     int m_motiontime = 0;
