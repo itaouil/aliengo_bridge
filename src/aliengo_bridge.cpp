@@ -99,9 +99,9 @@ namespace aliengo_bridge
         m_cmd.rpy[1] = 0.0f; // (unit: rad), desired pitch euler angle
         m_cmd.rpy[2] = 0.0f; // (unit: rad), desired yaw euler angle
 
-        m_cmd.velocity[0] = m_cmd_max_velocity; // (unit: m/s), forwardSpeed in body frame.
+        m_cmd.velocity[0] = 0.0f; // (unit: m/s), forwardSpeed in body frame.
         m_cmd.velocity[1] = 0.0f; // (unit: m/s), sideSpeed in body frame.
-        m_cmd.yawSpeed = 0.0f; // (unit: rad/s), rotateSpeed in body frame.
+        m_cmd.yawSpeed = m_cmd_max_velocity; // (unit: rad/s), rotateSpeed in body frame.
     }
 
     void AlienGoBridge::control() 
