@@ -114,13 +114,13 @@ namespace aliengo_bridge
         m_cmd_mutex.lock();
         if (!m_received_cmd)
         {
-            ROS_WARN_STREAM_THROTTLE( 5, "No cmd received." );
+            //ROS_WARN_STREAM_THROTTLE( 10, "No cmd received." );
             resetCmd();
         }
         // reset cmd after timeout
         else if ((ros::Time::now() - m_last_cmd_time).toSec() > m_cmd_timeout)
         {
-            ROS_WARN_STREAM( "Cmd timed out." );
+            //ROS_WARN_STREAM( "Cmd timed out." );
             resetCmd();
         }
         

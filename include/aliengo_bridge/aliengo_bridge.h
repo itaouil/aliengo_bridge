@@ -60,7 +60,7 @@ private:
     ros::Publisher m_joints_pub;
     
     ros::Time m_last_cmd_time;
-    float m_cmd_timeout = 1.;
+    float m_cmd_timeout = 0.1f;
     bool m_received_cmd = false;
     
     boost::mutex m_cmd_mutex;
