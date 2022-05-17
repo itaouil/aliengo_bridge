@@ -113,7 +113,7 @@ namespace aliengo_bridge
         m_cmd_mutex.lock();
         if (!m_received_cmd)
         {
-            ROS_WARN_STREAM_THROTTLE( 5, "No cmd received." );
+            //ROS_WARN_STREAM_THROTTLE( 5, "No cmd received." );
             resetCmd();
         }
         else
