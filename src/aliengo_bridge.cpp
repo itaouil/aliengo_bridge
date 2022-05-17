@@ -20,7 +20,7 @@ namespace aliengo_bridge
         m_last_velocity_update = ros::Time::now();
 
         // Publishers
-        m_cmd_pub = ph.advertise< unitree_legged_msgs::HighCmd >( "high_cmd", 1 );
+        m_cmd_pub = ph.advertise< unitree_legged_msgs::HighCmdStamped >( "high_cmd", 1 );
         m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "high_state", 1 );
         
         // SDK
@@ -40,7 +40,7 @@ namespace aliengo_bridge
     void AlienGoBridge::UDPSend()
     {  
         m_udp.Send();
-    }
+    }m_
 
     void AlienGoBridge::resetCmd()
     {
@@ -133,8 +133,9 @@ namespace aliengo_bridge
     {
         boost::mutex::scoped_lock lock(m_cmd_mutex);
         
-        unitree_legged_msgs::HighCmd msg;
+        unitree_legged_msgs::HighCmdStamped msg;
 
+        msg.header.stamp = ros::Time::now();
         msg.mode = m_cmd.mode;
         msg.gaitType = m_cmd.gaitType;
         msg.speedLevel = m_cmd.speedLevel;
@@ -157,9 +158,9 @@ namespace aliengo_bridge
         boost::mutex::scoped_lock lock(m_state_mutex);
         
         sensor_msgs::Imu l_imuMsg;
-        unitree_legged_msgs::HighState msg;
-        sensor_msgs::JointState l_jointStateMsg;
+        unitree_legged_msgs::HighStateStamped msg;
         
+        msg.header.stamp = ros::Time::now();
         msg.levelFlag = m_state.levelFlag;
         msg.commVersion = m_state.commVersion;
         msg.robotID = m_state.robotID;

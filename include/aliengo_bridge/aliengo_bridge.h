@@ -15,8 +15,8 @@
 #include <sensor_msgs/JointState.h>
 
 // Unitree
-#include <unitree_legged_msgs/HighCmd.h>
-#include <unitree_legged_msgs/HighState.h>
+#include <unitree_legged_msgs/HighCmdStamped.h>
+#include <unitree_legged_msgs/HighStateStamped.h>
 #include "unitree_legged_sdk/unitree_joystick.h"
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 
@@ -39,14 +39,13 @@ private:
     void publishState();
     void joystickUpdate();
     void joyCallback(const sensor_msgs::Joy::ConstPtr& msg);
-    void cmdCallback(const unitree_legged_msgs::HighCmd& cmd);
 
     ros::NodeHandle m_ph;
     
     UDP m_udp;
     Safety m_safe;
-    HighCmd m_cmd = {0};
-    HighState m_state = {0};
+    HighCmdStamped m_cmd = {0};
+    HighStateStamped m_state = {0};
 
     float m_dt = 0.002;
     int m_motiontime = 0;
