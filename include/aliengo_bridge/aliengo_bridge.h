@@ -21,6 +21,7 @@
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 
 using namespace UNITREE_LEGGED_SDK;
+using namespace unitree_legged_msgs;
 
 namespace aliengo_bridge
 {
@@ -44,8 +45,8 @@ private:
     
     UDP m_udp;
     Safety m_safe;
-    HighCmdStamped m_cmd = {0};
-    HighStateStamped m_state = {0};
+    HighCmdStamped m_cmd;
+    HighStateStamped m_state;
 
     float m_dt = 0.002;
     int m_motiontime = 0;

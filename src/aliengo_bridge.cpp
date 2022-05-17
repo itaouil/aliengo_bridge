@@ -21,7 +21,7 @@ namespace aliengo_bridge
 
         // Publishers
         m_cmd_pub = ph.advertise< unitree_legged_msgs::HighCmdStamped >( "high_cmd", 1 );
-        m_state_pub = ph.advertise< unitree_legged_msgs::HighState >( "high_state", 1 );
+        m_state_pub = ph.advertise< unitree_legged_msgs::HighStateStamped >( "high_state", 1 );
         
         // SDK
         m_udp.InitCmdData(m_cmd);
