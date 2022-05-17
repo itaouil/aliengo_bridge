@@ -45,6 +45,7 @@ private:
     
     UDP m_udp;
     Safety m_safe;
+    HighCmd m_cmdUDP;
     HighCmdStamped m_cmd;
     HighStateStamped m_state;
 
