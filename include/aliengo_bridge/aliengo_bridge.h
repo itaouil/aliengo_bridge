@@ -23,7 +23,6 @@
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 
 using namespace UNITREE_LEGGED_SDK;
-using namespace unitree_legged_msgs;
 
 namespace aliengo_bridge
 {
@@ -50,7 +49,7 @@ private:
     HighCmd m_cmd;
     HighState m_state;
 
-    float m_dt = 0.002;
+    float m_dt = 0.001;
     int m_motiontime = 0;
     int m_motion_timestep;
 
