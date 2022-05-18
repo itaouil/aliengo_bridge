@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<launch>
+  <!-- Start aliengo bridge -->
+  <node pkg="aliengo_bridge" type="aliengo_bridge" name="aliengo_bridge"></node>
+
+  <!-- Start robot state publisher -->
+  <include file="$(find aliengo_bridge)/launch/robot_state_publisher.launch"/>
+
+  <!-- Start t265 realsense -->
+  <include file="$(find aliengo_bridge)/launch/rs_t265.launch"/>
+
+  <!-- Start d435 realsense -->
+  <include file="$(find aliengo_bridge)/launch/rs_d435_848.launch"/>
+
+  <!-- Add t265 sensor to tf tree -->
+  <node pkg="aliengo_bridge" type="tf_sensors.py" name="tf_sensors"></node>
+
+  <!-- Start elevation mapping node -->
+  <include file="$(find elevation_mapping_demos)/launch/aliengo_real.launch"/>
+
+  <include file="$(find rslidar_sdk)/launch/start.launch"/>
+</launch>
