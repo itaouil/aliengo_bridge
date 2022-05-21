@@ -255,6 +255,7 @@ namespace aliengo_bridge
             }
             else if (((int)m_joy.btn.components.L1 == 1))
             {
+                m_positive_rot = true;
                 m_cmd_fwd_velocity = 0.0f;
                 m_cmd_rot_velocity = 0.0f;
                 ROS_INFO_STREAM("Reset forward and rotation velocity to: " << m_cmd_fwd_velocity << " and " << m_cmd_rot_velocity);
@@ -266,7 +267,7 @@ namespace aliengo_bridge
                 ROS_INFO_STREAM("Received command flag toggled: " << m_received_cmd);
                 m_last_velocity_update = ros::Time::now();
             }
-            else if(((int)m_joy.btn.components.F1 == 1))
+            else if(((int)m_joy.btn.components.L2 == 1))
             {
                 m_positive_rot = !m_positive_rot;
                 ROS_INFO_STREAM("Switched rotation sign to: " << m_positive_rot);
