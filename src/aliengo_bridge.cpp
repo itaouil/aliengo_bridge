@@ -101,7 +101,7 @@ namespace aliengo_bridge
 
         m_cmd.velocity[0] = 0.0f; // (unit: m/s), forwardSpeed in body frame.
         m_cmd.velocity[1] = 0.0f; // (unit: m/s), sideSpeed in body frame.
-        m_cmd.yawSpeed = -m_cmd_max_velocity; // (unit: rad/s), rotateSpeed in body frame.
+        m_cmd.yawSpeed = m_cmd_max_velocity; // (unit: rad/s), rotateSpeed in body frame.
     }
 
     void AlienGoBridge::control() 
