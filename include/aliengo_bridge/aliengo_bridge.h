@@ -54,9 +54,9 @@ private:
     int m_motion_timestep;
 
     xRockerBtnDataStruct m_joy;
-    uint8_t m_cmd_speed_level = 0;
-    float m_cmd_min_velocity = 0.0;
-    float m_cmd_max_velocity = 0.0;
+    bool m_positive_rot = true;
+    float m_cmd_rot_velocity = 0;
+    float m_cmd_fwd_velocity = 0.0;
     ros::Time m_last_velocity_update;
     
     LoopFunc m_loop_control;

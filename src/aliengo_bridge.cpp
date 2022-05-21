@@ -86,7 +86,7 @@ namespace aliengo_bridge
         
         m_cmd.gaitType = 0; // 0.trot | 1. trot running  | 2.climb stair
 
-        m_cmd.speedLevel = m_cmd_speed_level; // 0. default low speed. 1. medium speed 2. high speed. during walking
+        m_cmd.speedLevel = 2; // 0. default low speed. 1. medium speed 2. high speed. during walking
         
         m_cmd.dFootRaiseHeight = 0.08f; // (unit: m), swing foot height adjustment from default swing height.
 
@@ -99,9 +99,9 @@ namespace aliengo_bridge
         m_cmd.rpy[1] = 0.0f; // (unit: rad), desired pitch euler angle
         m_cmd.rpy[2] = 0.0f; // (unit: rad), desired yaw euler angle
 
-        m_cmd.velocity[0] = 0.0f; // (unit: m/s), forwardSpeed in body frame.
+        m_cmd.velocity[0] = m_cmd_fwd_velocity; // (unit: m/s), forwardSpeed in body frame.
         m_cmd.velocity[1] = 0.0f; // (unit: m/s), sideSpeed in body frame.
-        m_cmd.yawSpeed = m_cmd_max_velocity; // (unit: rad/s), rotateSpeed in body frame.
+        m_cmd.yawSpeed = m_positive_rot ? m_cmd_rot_velocity : -m_cmd_rot_velocity; // (unit: rad/s), rotateSpeed in body frame.
     }
 
     void AlienGoBridge::control() 
@@ -226,44 +226,50 @@ namespace aliengo_bridge
         
         memcpy(&m_joy, m_state.wirelessRemote, 40);
 
-        // Update velocities every second otherwise values increase too quick
+        // Update velocities every half a second
         if ((ros::Time::now() - m_last_velocity_update).toSec() > 0.5)
         {
-            if (((int)m_joy.btn.components.up == 1) && m_cmd_max_velocity < 1.0) 
+            if (((int)m_joy.btn.components.up == 1) && m_cmd_fwd_velocity < 1.0) 
             {
-                m_cmd_max_velocity += 0.1;
-                ROS_INFO_STREAM("Increased max velocity by 0.1: " << m_cmd_max_velocity);
+                m_cmd_fwd_velocity += 0.1;
+                ROS_INFO_STREAM("Increased forward velocity to: " << m_cmd_fwd_velocity);
                 m_last_velocity_update = ros::Time::now();
             }
-            else if (((int)m_joy.btn.components.down == 1) && m_cmd_max_velocity > 0.1)
+            else if (((int)m_joy.btn.components.down == 1) && m_cmd_fwd_velocity > 0.1)
             {
-                m_cmd_max_velocity -= 0.1;
-                ROS_INFO_STREAM("Decreased max velocity by 0.1: " << m_cmd_max_velocity);
+                m_cmd_fwd_velocity -= 0.1;
+                ROS_INFO_STREAM("Decreased forward velocity to: " << m_cmd_fwd_velocity);
                 m_last_velocity_update = ros::Time::now();
             }
-            else if (((int)m_joy.btn.components.Y == 1) && m_cmd_speed_level < 2)
+            else if (((int)m_joy.btn.components.right == 1) && m_cmd_rot_velocity < 0.4) 
             {
-                m_cmd_speed_level += 1;
-                ROS_INFO_STREAM("Increased speed level by 1 to: " << (int)m_cmd_speed_level);
+                m_cmd_rot_velocity += 0.1;
+                ROS_INFO_STREAM("Increased rotation velocity to: " << m_cmd_rot_velocity);
                 m_last_velocity_update = ros::Time::now();
             }
-            else if (((int)m_joy.btn.components.A == 1) && m_cmd_speed_level > 0)
+            else if (((int)m_joy.btn.components.left == 1) && m_cmd_rot_velocity > 0.1)
             {
-                m_cmd_speed_level -= 1;
-                ROS_INFO_STREAM("Decreased speed level by 1 to: " << (int)m_cmd_speed_level);
+                m_cmd_rot_velocity -= 0.1;
+                ROS_INFO_STREAM("Decreased rotation velocity to: " << m_cmd_rot_velocity);
                 m_last_velocity_update = ros::Time::now();
             }
             else if (((int)m_joy.btn.components.L1 == 1))
             {
-                m_cmd_speed_level = 0;
-                m_cmd_max_velocity = 0.0f;
-                ROS_INFO_STREAM("Reset max velocity and speed level to: " << m_cmd_max_velocity << " and " << (int)m_cmd_speed_level);
+                m_cmd_fwd_velocity = 0.0f;
+                m_cmd_rot_velocity = 0.0f;
+                ROS_INFO_STREAM("Reset forward and rotation velocity to: " << m_cmd_fwd_velocity << " and " << m_cmd_rot_velocity);
                 m_last_velocity_update = ros::Time::now();
             }
             else if (((int)m_joy.btn.components.select == 1))
             {
                 m_received_cmd = !m_received_cmd;
-                ROS_INFO_STREAM("Received command flag toggled " << m_received_cmd);
+                ROS_INFO_STREAM("Received command flag toggled: " << m_received_cmd);
+                m_last_velocity_update = ros::Time::now();
+            }
+            else if(((int)m_joy.btn.components.F1 == 1))
+            {
+                m_positive_rot = !m_positive_rot;
+                ROS_INFO_STREAM("Switched rotation sign to: " << m_positive_rot);
                 m_last_velocity_update = ros::Time::now();
             }
         }
